@@ -10,7 +10,10 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./schema_seed.sql:/docker-entrypoint-initdb.d/schema_seed.sql
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ./db/seed_calidad_aire_01_InviernoTemprano.sql:/docker-entrypoint-initdb.d/02_seed_01.sql
+      - ./db/seed_calidad_aire_02_inviernoIIntenso.sql:/docker-entrypoint-initdb.d/03_seed_02.sql
+      - ./db/seed_calidad_aire_03_primavera.sql:/docker-entrypoint-initdb.d/04_seed_03.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-calidad_aire_db}"]
       interval: 10s

@@ -7,50 +7,65 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import EstacionSensor, MonitoreoAmbiental
-from app.schemas import (
-    DatasetMLResponse,
-    MonitoreoCreate,
-    MonitoreoDetalleResponse,
-    ResumenComunaResponse,
-)
+from app.schemas import MonitoreoCreate, MonitoreoDetalleResponse
 
 router = APIRouter(tags=["Monitoreo"])
+
+
+MONITOREO_SELECT = """
+    SELECT
+        m.id_monitoreo,
+        m.fecha_hora,
+        c.nombre AS comuna,
+        c.region,
+        c.poblacion_estimada,
+        c.indice_vulnerabilidad_respiratoria,
+        e.codigo_unico,
+        e.tipo,
+        e.latitud,
+        e.longitud,
+        m.mp25,
+        m.mp10,
+        m.so2,
+        m.no2,
+        m.velocidad_viento,
+        m.direccion_viento_grados,
+        m.temperatura,
+        m.humedad
+    FROM monitoreo_ambiental m
+    INNER JOIN estaciones_sensores e
+        ON e.id_estacion = m.id_estacion
+    INNER JOIN comunas c
+        ON c.id_comuna = e.id_comuna
+"""
 
 
 @router.get("/monitoreo", response_model=list[MonitoreoDetalleResponse])
 def listar_monitoreo(
     comuna: str | None = Query(default=None),
     region: str | None = Query(default=None),
-    nivel_riesgo: str | None = Query(default=None),
     fecha_inicio: datetime | None = Query(default=None),
     fecha_fin: datetime | None = Query(default=None),
     limit: int = Query(default=100, ge=1, le=1000),
     db: Session = Depends(get_db),
 ):
-    query = """
-        SELECT *
-        FROM vw_monitoreo_detalle
-        WHERE 1 = 1
-    """
+    query = MONITOREO_SELECT + "\nWHERE 1 = 1"
     params: dict[str, object] = {"limit_value": limit}
 
     if comuna:
-        query += " AND comuna ILIKE :comuna"
+        query += " AND c.nombre ILIKE :comuna"
         params["comuna"] = f"%{comuna}%"
     if region:
-        query += " AND region = :region"
+        query += " AND c.region = :region"
         params["region"] = region
-    if nivel_riesgo:
-        query += " AND nivel_riesgo = :nivel_riesgo"
-        params["nivel_riesgo"] = nivel_riesgo
     if fecha_inicio:
-        query += " AND fecha_hora >= :fecha_inicio"
+        query += " AND m.fecha_hora >= :fecha_inicio"
         params["fecha_inicio"] = fecha_inicio
     if fecha_fin:
-        query += " AND fecha_hora <= :fecha_fin"
+        query += " AND m.fecha_hora <= :fecha_fin"
         params["fecha_fin"] = fecha_fin
 
-    query += " ORDER BY fecha_hora DESC LIMIT :limit_value"
+    query += " ORDER BY m.fecha_hora DESC LIMIT :limit_value"
 
     try:
         rows = db.execute(text(query), params).mappings().all()
@@ -61,13 +76,7 @@ def listar_monitoreo(
 
 @router.get("/monitoreo/{id_monitoreo}", response_model=MonitoreoDetalleResponse)
 def obtener_monitoreo(id_monitoreo: int, db: Session = Depends(get_db)):
-    query = text(
-        """
-        SELECT *
-        FROM vw_monitoreo_detalle
-        WHERE id_monitoreo = :id_monitoreo
-        """
-    )
+    query = text(MONITOREO_SELECT + "\nWHERE m.id_monitoreo = :id_monitoreo")
 
     try:
         row = db.execute(query, {"id_monitoreo": id_monitoreo}).mappings().first()
@@ -81,9 +90,13 @@ def obtener_monitoreo(id_monitoreo: int, db: Session = Depends(get_db)):
 
 @router.post("/monitoreo", response_model=MonitoreoDetalleResponse, status_code=status.HTTP_201_CREATED)
 def crear_monitoreo(payload: MonitoreoCreate, db: Session = Depends(get_db)):
-    estacion = db.query(EstacionSensor).filter(EstacionSensor.id_estacion == payload.id_estacion).first()
+    estacion = (
+        db.query(EstacionSensor)
+        .filter(EstacionSensor.id_estacion == payload.id_estacion)
+        .first()
+    )
     if estacion is None:
-        raise HTTPException(status_code=404, detail="La estación indicada no existe.")
+        raise HTTPException(status_code=404, detail="La estacion indicada no existe.")
 
     nuevo_monitoreo = MonitoreoAmbiental(**payload.model_dump())
 
@@ -91,15 +104,8 @@ def crear_monitoreo(payload: MonitoreoCreate, db: Session = Depends(get_db)):
         db.add(nuevo_monitoreo)
         db.commit()
         db.refresh(nuevo_monitoreo)
-
         row = db.execute(
-            text(
-                """
-                SELECT *
-                FROM vw_monitoreo_detalle
-                WHERE id_monitoreo = :id_monitoreo
-                """
-            ),
+            text(MONITOREO_SELECT + "\nWHERE m.id_monitoreo = :id_monitoreo"),
             {"id_monitoreo": nuevo_monitoreo.id_monitoreo},
         ).mappings().first()
     except IntegrityError as exc:
@@ -113,44 +119,8 @@ def crear_monitoreo(payload: MonitoreoCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Error al crear el monitoreo.") from exc
 
     if row is None:
-        raise HTTPException(status_code=500, detail="El monitoreo se creó, pero no pudo recuperarse.")
+        raise HTTPException(
+            status_code=500,
+            detail="El monitoreo se creo, pero no pudo recuperarse.",
+        )
     return MonitoreoDetalleResponse(**row)
-
-
-@router.get("/resumen/comunas", response_model=list[ResumenComunaResponse])
-def resumen_comunas(db: Session = Depends(get_db)):
-    try:
-        rows = db.execute(
-            text(
-                """
-                SELECT *
-                FROM vw_resumen_comuna
-                ORDER BY comuna
-                """
-            )
-        ).mappings().all()
-        return [ResumenComunaResponse(**row) for row in rows]
-    except SQLAlchemyError as exc:
-        raise HTTPException(status_code=500, detail="Error al consultar el resumen por comunas.") from exc
-
-
-@router.get("/dataset/ml", response_model=list[DatasetMLResponse])
-def dataset_ml(
-    limit: int = Query(default=500, ge=1, le=5000),
-    db: Session = Depends(get_db),
-):
-    try:
-        rows = db.execute(
-            text(
-                """
-                SELECT *
-                FROM vw_dataset_ml
-                ORDER BY id_monitoreo
-                LIMIT :limit_value
-                """
-            ),
-            {"limit_value": limit},
-        ).mappings().all()
-        return [DatasetMLResponse(**row) for row in rows]
-    except SQLAlchemyError as exc:
-        raise HTTPException(status_code=500, detail="Error al consultar el dataset ML.") from exc

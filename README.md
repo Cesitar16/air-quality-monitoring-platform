@@ -1,33 +1,51 @@
 # Monitoreo de Calidad del Aire
 
-API REST construida con FastAPI y PostgreSQL para una evaluación universitaria. El proyecto usa el archivo existente `schema_seed.sql` para crear la base de datos, poblarla con datos de prueba y generar las vistas usadas por la API.
+## Contexto del proyecto
 
-## Estructura del proyecto
+Este proyecto responde a la necesidad de una ONG ambiental y distintos municipios de la zona centro-sur de Chile de centralizar la información sobre calidad del aire. Actualmente los datos suelen estar dispersos, con formatos heterogéneos y tiempos de publicación que dificultan la detección temprana de episodios críticos de contaminación.
+
+La iniciativa busca consolidar comunas, sensores, fuentes industriales y mediciones ambientales en una plataforma común. Esto permite preparar una base sólida para análisis posteriores, integración con dashboards, notebooks y futuros modelos predictivos.
+
+## Objetivo del proyecto
+
+En esta etapa, el foco es construir una base de datos reproducible en PostgreSQL y un backend REST con FastAPI que permita consultar e insertar información del sistema de monitoreo.
+
+El alcance actual considera:
+
+- levantar la base de datos con Docker
+- cargar el esquema y las semillas del proyecto en el orden correcto
+- exponer endpoints REST simples para las entidades principales
+- dejar documentación Swagger lista para pruebas
+
+## Estructura del repositorio
 
 ```text
 .
-├── api
-│   ├── app
-│   │   ├── main.py
+├── api/
+│   ├── app/
 │   │   ├── database.py
+│   │   ├── main.py
 │   │   ├── models.py
 │   │   ├── schemas.py
-│   │   └── routes
-│   │       ├── comunas.py
-│   │       ├── estaciones.py
-│   │       ├── industrias.py
-│   │       └── monitoreo.py
+│   │   └── routes/
 │   ├── Dockerfile
 │   └── requirements.txt
+├── db/
+│   ├── schema.sql
+│   ├── seed_calidad_aire_01_InviernoTemprano.sql
+│   ├── seed_calidad_aire_02_inviernoIIntenso.sql
+│   └── seed_calidad_aire_03_primavera.sql
+├── docs/
+│   ├── 01_contexto_negocio.md
+│   └── 02_diccionario_datos.md
 ├── docker-compose.yml
 ├── .env.example
-├── README.md
-└── schema_seed.sql
+└── README.md
 ```
 
-## Cómo levantar el proyecto
+## Cómo ejecutar la BD
 
-1. Crear el archivo `.env` a partir del ejemplo:
+1. Crear el archivo `.env` desde el ejemplo:
 
 ```bash
 cp .env.example .env
@@ -39,66 +57,57 @@ En PowerShell:
 Copy-Item .env.example .env
 ```
 
-2. Levantar PostgreSQL y FastAPI:
+2. Levantar solo la base de datos:
+
+```bash
+docker compose up db
+```
+
+3. PostgreSQL ejecutará automáticamente, en este orden, durante la primera inicialización del volumen:
+
+- `db/schema.sql`
+- `db/seed_calidad_aire_01_InviernoTemprano.sql`
+- `db/seed_calidad_aire_02_inviernoIIntenso.sql`
+- `db/seed_calidad_aire_03_primavera.sql`
+
+4. Si modificas el esquema o las semillas y quieres reconstruir la base desde cero:
+
+```bash
+docker compose down -v
+docker compose up db
+```
+
+## Cómo ejecutar el backend
+
+1. Levantar todo el proyecto:
 
 ```bash
 docker compose up --build
 ```
 
-3. Abrir la API en:
+2. Acceder a:
 
-- `http://localhost:8000`
+- API: `http://localhost:8000`
 - Swagger: `http://localhost:8000/docs`
 
-## Servicios Docker
-
-- `db`: PostgreSQL 16
-- `api`: FastAPI con Uvicorn
-
-## Variables de entorno
-
-```env
-POSTGRES_DB=calidad_aire_db
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_HOST=db
-POSTGRES_PORT=5432
-DATABASE_URL=postgresql+psycopg2://postgres:postgres@db:5432/calidad_aire_db
-```
-
-## Endpoints disponibles
-
-### Health
+3. Endpoints disponibles:
 
 - `GET /`
 - `GET /health`
-
-### Comunas
-
 - `GET /comunas`
 - `GET /comunas/{id_comuna}`
-
-### Estaciones
-
 - `GET /estaciones`
 - `GET /estaciones/{id_estacion}`
-
-### Industrias
-
 - `GET /industrias`
 - `GET /industrias/{id_industria}`
-
-### Monitoreo
-
 - `GET /monitoreo`
 - `GET /monitoreo/{id_monitoreo}`
 - `POST /monitoreo`
 
-Filtros opcionales para `GET /monitoreo`:
+4. Filtros opcionales para `GET /monitoreo`:
 
 - `comuna`
 - `region`
-- `nivel_riesgo`
 - `fecha_inicio`
 - `fecha_fin`
 - `limit`
@@ -106,25 +115,16 @@ Filtros opcionales para `GET /monitoreo`:
 Ejemplo:
 
 ```bash
-curl "http://localhost:8000/monitoreo?comuna=Talca&nivel_riesgo=critico&limit=10"
+curl "http://localhost:8000/monitoreo?comuna=Talca&limit=10"
 ```
 
-### Resumen y dataset
-
-- `GET /resumen/comunas`
-- `GET /dataset/ml`
-
-## Cómo probar el POST /monitoreo
-
-El campo `nivel_riesgo` no se envía desde la API porque PostgreSQL lo calcula automáticamente mediante trigger.
-
-Ejemplo con `curl`:
+5. Ejemplo de `POST /monitoreo`:
 
 ```bash
 curl -X POST "http://localhost:8000/monitoreo" \
   -H "Content-Type: application/json" \
   -d '{
-    "fecha_hora": "2026-06-17T10:00:00",
+    "fecha_hora": "2026-06-18T10:00:00",
     "id_estacion": 1,
     "mp25": 42.5,
     "mp10": 75.1,
@@ -133,16 +133,15 @@ curl -X POST "http://localhost:8000/monitoreo" \
     "velocidad_viento": 4.8,
     "direccion_viento_grados": 180,
     "temperatura": 14.2,
-    "humedad": 62.0,
-    "fuente_dato": "api_fastapi"
+    "humedad": 62.0
   }'
 ```
 
-Ejemplo en PowerShell:
+En PowerShell:
 
 ```powershell
 $body = @{
-  fecha_hora = "2026-06-17T10:00:00"
+  fecha_hora = "2026-06-18T10:00:00"
   id_estacion = 1
   mp25 = 42.5
   mp10 = 75.1
@@ -152,23 +151,7 @@ $body = @{
   direccion_viento_grados = 180
   temperatura = 14.2
   humedad = 62.0
-  fuente_dato = "api_fastapi"
 } | ConvertTo-Json
 
 Invoke-RestMethod -Method Post -Uri "http://localhost:8000/monitoreo" -ContentType "application/json" -Body $body
 ```
-
-## Cómo reiniciar la base de datos si cambia schema_seed.sql
-
-PostgreSQL solo ejecuta `schema_seed.sql` la primera vez que crea el volumen. Si cambias el SQL y quieres reconstruir la base desde cero:
-
-```bash
-docker compose down -v
-docker compose up --build
-```
-
-## Notas de implementación
-
-- Se usa SQLAlchemy para la conexión y las consultas básicas.
-- `GET /monitoreo`, `GET /resumen/comunas` y `GET /dataset/ml` consultan las vistas creadas por `schema_seed.sql`.
-- El código está pensado para ser claro y simple, ideal para una evaluación.
