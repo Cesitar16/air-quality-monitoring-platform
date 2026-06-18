@@ -502,13 +502,6 @@ SELECT
     COUNT(*) AS cantidad_registros
 FROM monitoreo_ambiental
 GROUP BY categoria_icap
-ORDER BY
-    CASE categoria_icap
-        WHEN 'Buena' THEN 1
-        WHEN 'Regular' THEN 2
-        WHEN 'Alerta' THEN 3
-        WHEN 'Preemergencia' THEN 4
-        WHEN 'Emergencia' THEN 5
-    END;
+ORDER BY 1;
 
 COMMIT;
