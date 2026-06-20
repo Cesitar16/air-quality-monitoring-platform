@@ -29,5 +29,8 @@ def obtener_industria(id_industria: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Error al consultar la industria.") from exc
 
     if industria is None:
-        raise HTTPException(status_code=404, detail="Industria no encontrada.")
+        raise HTTPException(
+            status_code=404,
+            detail=f"No existe una industria con id_industria={id_industria}",
+        )
     return industria
