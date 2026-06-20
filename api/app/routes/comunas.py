@@ -25,5 +25,8 @@ def obtener_comuna(id_comuna: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Error al consultar la comuna.") from exc
 
     if comuna is None:
-        raise HTTPException(status_code=404, detail="Comuna no encontrada.")
+        raise HTTPException(
+            status_code=404,
+            detail=f"No existe una comuna con id_comuna={id_comuna}",
+        )
     return comuna

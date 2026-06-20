@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, Numeric, String
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, Numeric, String, UniqueConstraint
 
 from app.database import Base
 
@@ -36,6 +36,13 @@ class IndustriaFuente(Base):
 
 class MonitoreoAmbiental(Base):
     __tablename__ = "monitoreo_ambiental"
+    __table_args__ = (
+        UniqueConstraint(
+            "id_estacion",
+            "fecha_hora",
+            name="uk_monitoreo_ambiental_estacion_fecha",
+        ),
+    )
 
     id_monitoreo = Column(Integer, primary_key=True, index=True)
     fecha_hora = Column(DateTime, nullable=False)

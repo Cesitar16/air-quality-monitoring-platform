@@ -29,5 +29,8 @@ def obtener_estacion(id_estacion: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Error al consultar la estación.") from exc
 
     if estacion is None:
-        raise HTTPException(status_code=404, detail="Estación no encontrada.")
+        raise HTTPException(
+            status_code=404,
+            detail=f"No existe una estacion con id_estacion={id_estacion}",
+        )
     return estacion
