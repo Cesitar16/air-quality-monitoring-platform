@@ -1,0 +1,5 @@
+fecha_hora,codigo_estacion,comuna,region,mp25,mp10,so2,no2,velocidad_viento,direccion_viento_grados,temperatura,humedad,fuente_dato,numero_fila,motivo_error,fase
+2026-09-12 06:00:00,OF-HUA-001,Hualpén,Biobío,54.9,103.2,48.7,60.5,2.4,372.0,7.6,87.0,oficial,29,direccion_viento_grados fuera de rango,validate
+2026-09-12 06:00:00,OF-HUA-001,Hualpén,Biobío,54.9,103.2,48.7,60.5,2.4,372.0,7.6,87.0,oficial,30,direccion_viento_grados fuera de rango; duplicado codigo_estacion+fecha_hora,validate
+2026-09-12 18:00:00,OF-HUA-001,Hualpén,Biobío,46.1,84.6,42.3,,5.2,138.0,12.6,68.0,oficial,31,no2 faltante,validate
+2026-09-15 12:00:00,ONG-HUA-001,Hualpén,Biobío,-3.5,63.8,39.9,50.7,,,,,comunitaria,62,mp25 negativo,validate

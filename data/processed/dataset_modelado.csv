@@ -1,0 +1,101 @@
+fecha_hora,comuna,region,codigo_estacion,tipo_sensor,mp25,mp10,so2,no2,velocidad_viento,direccion_viento_grados,temperatura,humedad,indice_vulnerabilidad_respiratoria,emision_maxima_permitida,categoria_ica
+2026-11-30T18:00:00,Curicó,Maule,SEN-CUR-ONG-001,sensor_comunitario_ong,26.6,60.89,18.0,50.0,5.27,276.0,21.78,56.0,60.0,95.0,Buena
+2026-11-30T18:00:00,Curicó,Maule,SEN-CUR-OF-001,publico_oficial,25.1,58.42,18.0,50.0,5.27,44.0,21.78,56.0,60.0,95.0,Buena
+2026-11-30T18:00:00,San Fernando,O'Higgins,SEN-SF-OF-001,publico_oficial,24.1,52.77,18.0,42.0,5.27,331.0,22.28,56.0,58.0,125.0,Buena
+2026-11-30T18:00:00,Concepción,Biobío,SEN-CON-OF-001,publico_oficial,25.1,54.42,39.0,65.0,5.27,63.0,20.78,56.0,69.5,390.0,Buena
+2026-11-30T18:00:00,San Fernando,O'Higgins,SEN-SF-ONG-001,sensor_comunitario_ong,25.6,55.24,18.0,42.0,5.27,202.0,22.28,56.0,58.0,125.0,Buena
+2026-11-30T18:00:00,Rancagua,O'Higgins,SEN-RAN-ONG-002,sensor_comunitario_ong,28.6,63.19,34.0,59.0,5.27,294.0,22.28,56.0,61.5,320.0,Buena
+2026-11-30T18:00:00,Los Ángeles,Biobío,SEN-LAN-ONG-001,sensor_comunitario_ong,34.6,76.09,18.0,49.0,5.27,266.0,20.78,56.0,74.3,260.0,Buena
+2026-11-30T18:00:00,Constitución,Maule,SEN-CONST-OF-001,publico_oficial,24.1,52.77,30.0,42.0,5.27,53.0,21.78,56.0,63.2,210.0,Buena
+2026-11-30T18:00:00,Los Ángeles,Biobío,SEN-LAN-OF-001,publico_oficial,33.1,73.62,18.0,49.0,5.27,174.0,20.78,56.0,74.3,260.0,Buena
+2026-11-30T18:00:00,Coihueco,Ñuble,SEN-COI-ONG-001,sensor_comunitario_ong,31.6,71.14,18.0,42.0,5.27,136.0,21.18,56.0,69.1,125.0,Buena
+2026-11-30T18:00:00,Chillán,Ñuble,SEN-CHI-ONG-001,sensor_comunitario_ong,33.6,74.44,18.0,48.0,5.27,350.0,21.18,56.0,72.8,180.0,Buena
+2026-11-30T18:00:00,Talcahuano,Biobío,SEN-TALC-OF-001,publico_oficial,29.1,81.02,54.0,73.0,5.27,173.0,20.78,56.0,70.2,360.0,Buena
+2026-11-30T18:00:00,Rancagua,O'Higgins,SEN-RAN-OF-001,publico_oficial,27.1,60.72,34.0,59.0,5.27,128.0,22.28,56.0,61.5,320.0,Buena
+2026-11-30T18:00:00,Talca,Maule,SEN-TAL-OF-001,publico_oficial,26.1,60.07,28.0,54.0,5.27,239.0,21.78,56.0,64.2,420.0,Buena
+2026-11-30T18:00:00,San Vicente,O'Higgins,SEN-SVI-ONG-001,sensor_comunitario_ong,28.6,63.19,18.0,42.0,5.27,312.0,22.28,56.0,59.6,105.0,Buena
+2026-11-30T18:00:00,Linares,Maule,SEN-LIN-OF-001,publico_oficial,28.1,63.37,18.0,42.0,5.27,303.0,21.78,56.0,67.8,155.0,Buena
+2026-11-30T18:00:00,Parral,Maule,SEN-PAR-ONG-001,sensor_comunitario_ong,30.6,67.49,18.0,42.0,5.27,16.0,21.78,56.0,70.4,90.0,Buena
+2026-11-30T18:00:00,San Carlos,Ñuble,SEN-SCA-OF-001,publico_oficial,30.1,68.67,18.0,42.0,5.27,118.0,21.18,56.0,66.1,,Buena
+2026-11-30T18:00:00,Tomé,Biobío,SEN-TOM-ONG-001,sensor_comunitario_ong,25.6,55.24,18.0,42.0,5.27,127.0,20.78,56.0,66.7,140.0,Buena
+2026-11-30T18:00:00,Los Ángeles,Biobío,SEN-LAN-ONG-002,sensor_comunitario_ong,34.6,76.09,18.0,49.0,5.27,358.0,20.78,56.0,74.3,260.0,Buena
+2026-11-30T18:00:00,Hualpén,Biobío,SEN-HUA-ONG-002,sensor_comunitario_ong,30.6,83.49,50.0,70.0,5.27,284.0,20.78,56.0,68.4,500.0,Buena
+2026-11-30T18:00:00,San Carlos,Ñuble,SEN-SCA-ONG-001,sensor_comunitario_ong,31.6,71.14,18.0,42.0,5.27,26.0,21.18,56.0,66.1,,Buena
+2026-11-30T18:00:00,Machalí,O'Higgins,SEN-MAC-OF-001,publico_oficial,24.1,55.77,36.0,57.0,5.27,349.0,22.28,56.0,54.8,280.0,Buena
+2026-11-30T18:00:00,Hualpén,Biobío,SEN-HUA-OF-001,publico_oficial,29.1,81.02,50.0,70.0,5.27,100.0,20.78,56.0,68.4,500.0,Buena
+2026-11-30T18:00:00,Arauco,Biobío,SEN-ARA-ONG-001,sensor_comunitario_ong,31.6,85.14,46.0,42.0,5.27,210.0,20.78,56.0,72.7,540.0,Buena
+2026-11-30T18:00:00,Rancagua,O'Higgins,SEN-RAN-ONG-001,sensor_comunitario_ong,28.6,63.19,34.0,59.0,5.27,165.0,22.28,56.0,61.5,320.0,Buena
+2026-11-30T18:00:00,Molina,Maule,SEN-MOL-ONG-001,sensor_comunitario_ong,26.6,60.89,18.0,42.0,5.27,25.0,21.78,56.0,62.5,92.0,Buena
+2026-11-30T18:00:00,Coronel,Biobío,SEN-COR-ONG-001,sensor_comunitario_ong,33.6,88.44,56.0,72.0,5.27,137.0,20.78,56.0,76.2,650.0,Buena
+2026-11-30T18:00:00,Chillán,Ñuble,SEN-CHI-OF-001,publico_oficial,32.1,71.97,18.0,48.0,5.27,313.0,21.18,56.0,72.8,180.0,Buena
+2026-11-30T18:00:00,Coronel,Biobío,SEN-COR-ONG-002,sensor_comunitario_ong,33.6,88.44,56.0,72.0,5.27,247.0,20.78,56.0,76.2,650.0,Buena
+2026-11-30T18:00:00,Coronel,Biobío,SEN-COR-OF-001,publico_oficial,32.1,85.97,56.0,72.0,5.27,229.0,20.78,56.0,76.2,650.0,Buena
+2026-11-30T18:00:00,Cabrero,Biobío,SEN-CAB-ONG-001,sensor_comunitario_ong,29.6,61.84,18.0,42.0,5.27,275.0,20.78,56.0,69.3,190.0,Buena
+2026-11-30T18:00:00,Penco,Biobío,SEN-PEN-OF-001,publico_oficial,26.1,76.07,45.0,62.0,5.27,164.0,20.78,56.0,64.8,310.0,Buena
+2026-11-30T18:00:00,Cauquenes,Maule,SEN-CAU-ONG-001,sensor_comunitario_ong,25.6,55.24,18.0,42.0,5.27,90.0,21.78,56.0,65.9,,Buena
+2026-11-30T18:00:00,Nacimiento,Biobío,SEN-NAC-OF-001,publico_oficial,31.1,70.32,38.0,42.0,5.27,238.0,20.78,56.0,71.6,520.0,Buena
+2026-11-30T18:00:00,Concepción,Biobío,SEN-CON-ONG-001,sensor_comunitario_ong,26.6,56.89,39.0,65.0,5.27,155.0,20.78,56.0,69.5,390.0,Buena
+2026-11-30T18:00:00,Chillán,Ñuble,SEN-CHI-ONG-002,sensor_comunitario_ong,33.6,74.44,18.0,48.0,5.27,81.0,21.18,56.0,72.8,180.0,Buena
+2026-11-30T18:00:00,Hualpén,Biobío,SEN-HUA-ONG-001,sensor_comunitario_ong,30.6,83.49,50.0,70.0,5.27,192.0,20.78,56.0,68.4,500.0,Buena
+2026-11-30T18:00:00,Talca,Maule,SEN-TAL-ONG-002,sensor_comunitario_ong,27.6,62.54,28.0,54.0,5.27,321.0,21.78,56.0,64.2,420.0,Buena
+2026-11-30T18:00:00,Linares,Maule,SEN-LIN-ONG-001,sensor_comunitario_ong,29.6,65.84,18.0,42.0,5.27,340.0,21.78,56.0,67.8,155.0,Buena
+2026-11-30T18:00:00,Lota,Biobío,SEN-LOT-ONG-001,sensor_comunitario_ong,32.6,86.79,51.0,67.0,5.27,201.0,20.78,56.0,73.9,430.0,Buena
+2026-11-30T18:00:00,Talca,Maule,SEN-TAL-ONG-001,sensor_comunitario_ong,27.6,62.54,28.0,54.0,5.27,7.0,21.78,56.0,64.2,420.0,Buena
+2026-11-30T18:00:00,Bulnes,Ñuble,SEN-BUL-ONG-001,sensor_comunitario_ong,30.6,69.49,18.0,42.0,5.27,99.0,21.18,56.0,67.4,145.0,Buena
+2026-11-30T18:00:00,San Javier,Maule,SEN-SJA-OF-001,publico_oficial,26.1,60.07,18.0,42.0,5.27,62.0,21.78,56.0,66.3,135.0,Buena
+2026-11-30T12:00:00,San Carlos,Ñuble,SEN-SCA-ONG-001,sensor_comunitario_ong,21.6,54.64,18.0,34.0,6.37,357.0,25.28,42.0,66.1,,Buena
+2026-11-30T12:00:00,Concepción,Biobío,SEN-CON-OF-001,publico_oficial,15.1,37.92,39.0,57.0,6.37,33.0,24.88,42.0,69.5,390.0,Buena
+2026-11-30T12:00:00,Chillán,Ñuble,SEN-CHI-OF-001,publico_oficial,22.1,55.47,18.0,40.0,6.37,283.0,25.28,42.0,72.8,180.0,Buena
+2026-11-30T12:00:00,Talca,Maule,SEN-TAL-OF-001,publico_oficial,16.1,43.57,28.0,46.0,6.37,209.0,25.88,42.0,64.2,420.0,Buena
+2026-11-30T12:00:00,Curicó,Maule,SEN-CUR-ONG-001,sensor_comunitario_ong,16.6,44.39,18.0,42.0,6.37,246.0,25.88,42.0,60.0,95.0,Buena
+2026-11-30T12:00:00,Hualpén,Biobío,SEN-HUA-OF-001,publico_oficial,19.1,64.52,50.0,62.0,6.37,70.0,24.88,42.0,68.4,500.0,Buena
+2026-11-30T12:00:00,Rancagua,O'Higgins,SEN-RAN-OF-001,publico_oficial,17.1,44.22,34.0,51.0,6.37,98.0,26.38,42.0,61.5,320.0,Buena
+2026-11-30T12:00:00,Rancagua,O'Higgins,SEN-RAN-ONG-001,sensor_comunitario_ong,18.6,46.69,34.0,51.0,6.37,135.0,26.38,42.0,61.5,320.0,Buena
+2026-11-30T12:00:00,Los Ángeles,Biobío,SEN-LAN-ONG-002,sensor_comunitario_ong,24.6,59.59,18.0,41.0,6.37,328.0,24.88,42.0,74.3,260.0,Buena
+2026-11-30T12:00:00,Coronel,Biobío,SEN-COR-ONG-001,sensor_comunitario_ong,23.6,71.94,56.0,64.0,6.37,107.0,24.88,42.0,76.2,650.0,Buena
+2026-11-30T12:00:00,Hualpén,Biobío,SEN-HUA-ONG-002,sensor_comunitario_ong,20.6,66.99,50.0,62.0,6.37,254.0,24.88,42.0,68.4,500.0,Buena
+2026-11-30T12:00:00,Talca,Maule,SEN-TAL-ONG-002,sensor_comunitario_ong,17.6,46.04,28.0,46.0,6.37,291.0,25.88,42.0,64.2,420.0,Buena
+2026-11-30T12:00:00,San Fernando,O'Higgins,SEN-SF-ONG-001,sensor_comunitario_ong,15.6,38.74,18.0,34.0,6.37,172.0,26.38,42.0,58.0,125.0,Buena
+2026-11-30T12:00:00,Bulnes,Ñuble,SEN-BUL-ONG-001,sensor_comunitario_ong,20.6,52.99,18.0,34.0,6.37,69.0,25.28,42.0,67.4,145.0,Buena
+2026-11-30T12:00:00,Coihueco,Ñuble,SEN-COI-ONG-001,sensor_comunitario_ong,21.6,54.64,18.0,34.0,6.37,106.0,25.28,42.0,69.1,125.0,Buena
+2026-11-30T12:00:00,San Javier,Maule,SEN-SJA-OF-001,publico_oficial,16.1,43.57,18.0,34.0,6.37,32.0,25.88,42.0,66.3,135.0,Buena
+2026-11-30T12:00:00,Talcahuano,Biobío,SEN-TALC-OF-001,publico_oficial,19.1,64.52,54.0,65.0,6.37,143.0,24.88,42.0,70.2,360.0,Buena
+2026-11-30T12:00:00,Chillán,Ñuble,SEN-CHI-ONG-001,sensor_comunitario_ong,23.6,57.94,18.0,40.0,6.37,320.0,25.28,42.0,72.8,180.0,Buena
+2026-11-30T12:00:00,San Vicente,O'Higgins,SEN-SVI-ONG-001,sensor_comunitario_ong,18.6,46.69,18.0,34.0,6.37,282.0,26.38,42.0,59.6,105.0,Buena
+2026-11-30T12:00:00,Machalí,O'Higgins,SEN-MAC-OF-001,publico_oficial,14.1,39.27,36.0,49.0,6.37,319.0,26.38,42.0,54.8,280.0,Buena
+2026-11-30T12:00:00,Molina,Maule,SEN-MOL-ONG-001,sensor_comunitario_ong,16.6,44.39,18.0,34.0,6.37,356.0,25.88,42.0,62.5,92.0,Buena
+2026-11-30T12:00:00,Cabrero,Biobío,SEN-CAB-ONG-001,sensor_comunitario_ong,19.6,45.34,18.0,34.0,6.37,245.0,24.88,42.0,69.3,190.0,Buena
+2026-11-30T12:00:00,Arauco,Biobío,SEN-ARA-ONG-001,sensor_comunitario_ong,21.6,68.64,46.0,34.0,6.37,180.0,24.88,42.0,72.7,540.0,Buena
+2026-11-30T12:00:00,Tomé,Biobío,SEN-TOM-ONG-001,sensor_comunitario_ong,15.6,38.74,18.0,34.0,6.37,97.0,24.88,42.0,66.7,140.0,Buena
+2026-11-30T12:00:00,Parral,Maule,SEN-PAR-ONG-001,sensor_comunitario_ong,20.6,50.99,18.0,34.0,6.37,347.0,25.88,42.0,70.4,90.0,Buena
+2026-11-30T12:00:00,Penco,Biobío,SEN-PEN-OF-001,publico_oficial,16.1,59.57,45.0,54.0,6.37,134.0,24.88,42.0,64.8,310.0,Buena
+2026-11-30T12:00:00,Coronel,Biobío,SEN-COR-OF-001,publico_oficial,22.1,69.47,56.0,64.0,6.37,199.0,24.88,42.0,76.2,650.0,Buena
+2026-11-30T12:00:00,Los Ángeles,Biobío,SEN-LAN-ONG-001,sensor_comunitario_ong,24.6,59.59,18.0,41.0,6.37,236.0,24.88,42.0,74.3,260.0,Buena
+2026-11-30T12:00:00,Linares,Maule,SEN-LIN-OF-001,publico_oficial,18.1,46.87,18.0,34.0,6.37,273.0,25.88,42.0,67.8,155.0,Buena
+2026-11-30T12:00:00,Hualpén,Biobío,SEN-HUA-ONG-001,sensor_comunitario_ong,20.6,66.99,50.0,62.0,6.37,162.0,24.88,42.0,68.4,500.0,Buena
+2026-11-30T12:00:00,Lota,Biobío,SEN-LOT-ONG-001,sensor_comunitario_ong,22.6,70.29,51.0,59.0,6.37,171.0,24.88,42.0,73.9,430.0,Buena
+2026-11-30T12:00:00,Linares,Maule,SEN-LIN-ONG-001,sensor_comunitario_ong,19.6,49.34,18.0,34.0,6.37,310.0,25.88,42.0,67.8,155.0,Buena
+2026-11-30T12:00:00,Constitución,Maule,SEN-CONST-OF-001,publico_oficial,14.1,36.27,30.0,34.0,6.37,23.0,25.88,42.0,63.2,210.0,Buena
+2026-11-30T12:00:00,Cauquenes,Maule,SEN-CAU-ONG-001,sensor_comunitario_ong,15.6,38.74,18.0,34.0,6.37,60.0,25.88,42.0,65.9,,Buena
+2026-11-30T12:00:00,Curicó,Maule,SEN-CUR-OF-001,publico_oficial,15.1,41.92,18.0,42.0,6.37,14.0,25.88,42.0,60.0,95.0,Buena
+2026-11-30T12:00:00,Chillán,Ñuble,SEN-CHI-ONG-002,sensor_comunitario_ong,23.6,57.94,18.0,40.0,6.37,51.0,25.28,42.0,72.8,180.0,Buena
+2026-11-30T12:00:00,San Fernando,O'Higgins,SEN-SF-OF-001,publico_oficial,14.1,36.27,18.0,34.0,6.37,301.0,26.38,42.0,58.0,125.0,Buena
+2026-11-30T12:00:00,Talca,Maule,SEN-TAL-ONG-001,sensor_comunitario_ong,17.6,46.04,28.0,46.0,6.37,338.0,25.88,42.0,64.2,420.0,Buena
+2026-11-30T12:00:00,San Carlos,Ñuble,SEN-SCA-OF-001,publico_oficial,20.1,52.17,18.0,34.0,6.37,88.0,25.28,42.0,66.1,,Buena
+2026-11-30T12:00:00,Coronel,Biobío,SEN-COR-ONG-002,sensor_comunitario_ong,23.6,71.94,56.0,64.0,6.37,217.0,24.88,42.0,76.2,650.0,Buena
+2026-11-30T12:00:00,Los Ángeles,Biobío,SEN-LAN-OF-001,publico_oficial,23.1,57.12,18.0,41.0,6.37,144.0,24.88,42.0,74.3,260.0,Buena
+2026-11-30T12:00:00,Concepción,Biobío,SEN-CON-ONG-001,sensor_comunitario_ong,16.6,40.39,39.0,57.0,6.37,125.0,24.88,42.0,69.5,390.0,Buena
+2026-11-30T12:00:00,Rancagua,O'Higgins,SEN-RAN-ONG-002,sensor_comunitario_ong,18.6,46.69,34.0,51.0,6.37,264.0,26.38,42.0,61.5,320.0,Buena
+2026-11-30T12:00:00,Nacimiento,Biobío,SEN-NAC-OF-001,publico_oficial,21.1,53.82,38.0,34.0,6.37,208.0,24.88,42.0,71.6,520.0,Buena
+2026-11-30T06:00:00,Concepción,Biobío,SEN-CON-OF-001,publico_oficial,29.1,61.02,43.0,65.0,3.17,3.0,14.58,78.0,69.5,390.0,Buena
+2026-11-30T06:00:00,Hualpén,Biobío,SEN-HUA-OF-001,publico_oficial,33.1,87.62,54.0,70.0,3.17,40.0,14.58,78.0,68.4,500.0,Buena
+2026-11-30T06:00:00,Curicó,Maule,SEN-CUR-ONG-001,sensor_comunitario_ong,30.6,67.49,22.0,50.0,3.17,216.0,15.58,78.0,60.0,95.0,Buena
+2026-11-30T06:00:00,Chillán,Ñuble,SEN-CHI-OF-001,publico_oficial,36.1,78.57,22.0,48.0,3.17,253.0,14.98,78.0,72.8,180.0,Buena
+2026-11-30T06:00:00,Chillán,Ñuble,SEN-CHI-ONG-001,sensor_comunitario_ong,37.6,81.04,22.0,48.0,3.17,290.0,14.98,78.0,72.8,180.0,Buena
+2026-11-30T06:00:00,Talca,Maule,SEN-TAL-OF-001,publico_oficial,30.1,66.67,32.0,54.0,3.17,179.0,15.58,78.0,64.2,420.0,Buena
+2026-11-30T06:00:00,Rancagua,O'Higgins,SEN-RAN-OF-001,publico_oficial,31.1,67.32,38.0,59.0,3.17,68.0,16.08,78.0,61.5,320.0,Buena
+2026-11-30T06:00:00,Rancagua,O'Higgins,SEN-RAN-ONG-001,sensor_comunitario_ong,32.6,69.79,38.0,59.0,3.17,105.0,16.08,78.0,61.5,320.0,Buena
+2026-11-30T06:00:00,San Fernando,O'Higgins,SEN-SF-ONG-001,sensor_comunitario_ong,29.6,61.84,22.0,42.0,3.17,142.0,16.08,78.0,58.0,125.0,Buena
+2026-11-30T06:00:00,Coronel,Biobío,SEN-COR-ONG-001,sensor_comunitario_ong,37.6,95.04,60.0,72.0,3.17,77.0,14.58,78.0,76.2,650.0,Buena
+2026-11-30T06:00:00,San Carlos,Ñuble,SEN-SCA-ONG-001,sensor_comunitario_ong,35.6,77.74,22.0,42.0,3.17,327.0,14.98,78.0,66.1,,Buena
+2026-11-30T06:00:00,Talcahuano,Biobío,SEN-TALC-OF-001,publico_oficial,33.1,87.62,58.0,73.0,3.17,113.0,14.58,78.0,70.2,360.0,Buena
