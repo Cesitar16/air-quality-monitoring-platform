@@ -1,81 +1,77 @@
 # 09 - Manual de Usuario
 
-## Requisitos
+## 1. Preparar entorno
 
-- Python 3.12 o 3.13 recomendado para instalar dependencias locales del proyecto
-- Docker Desktop si se quiere levantar PostgreSQL y FastAPI con la configuracion versionada
-
-## Instalacion
-
-Desde la raiz del repositorio:
-
-```bash
+```powershell
 python -m pip install -r requirements.txt
 ```
 
-Si tambien se quiere ejecutar la API localmente fuera de Docker:
+Para ejecutar solo el dashboard:
 
-```bash
-python -m pip install -r api/requirements.txt
+```powershell
+python -m pip install -r dashboards/requirements.txt
 ```
 
-## Ejecutar ETL
+## 2. Levantar servicios base
 
-Modo local sin envio a API:
+```powershell
+docker compose up --build
+```
 
-```bash
+## 3. Ejecutar ETL
+
+Modo local:
+
+```powershell
 python etl/run_pipeline.py --dry-run
 ```
 
-Modo con API levantada:
+Modo integrado con API:
 
-```bash
-docker compose up --build
+```powershell
 python etl/run_pipeline.py --load-api
 ```
 
-El ETL deja sus salidas en `data/processed/`, incluyendo `dataset_modelado.csv`.
+## 4. Ejecutar clustering
 
-## Ejecutar regresion
+```powershell
+python src/clustering.py
+```
 
-Entrenamiento y exportacion de artefactos:
+## 5. Ejecutar regresion
 
-```bash
+```powershell
 python src/regression.py
 ```
 
-Artefactos generados:
+## 6. Ejecutar dashboard
 
-- `models/modelo_mp25_24h.joblib`
-- `models/metricas_regresion.json`
-- `data/processed/predicciones_mp25_24h.csv`
-
-## Ejecutar dashboard
-
-Con los artefactos ya generados:
-
-```bash
+```powershell
 streamlit run dashboards/app.py
 ```
 
-El dashboard usa:
+## 7. Ejecutar pruebas
 
-- `data/processed/dataset_modelado.csv`
-- `data/processed/predicciones_mp25_24h.csv`
-- `models/metricas_regresion.json`
-- `models/modelo_mp25_24h.joblib`
-
-## Ejecutar pruebas
-
-Pruebas ETL y API:
-
-```bash
-pytest tests/test_etl_load.py
-pytest tests/test_api_analytics.py
+```powershell
+python -m pytest -q
 ```
 
-Pruebas de regresion:
+El reporte automatizado se guarda en:
 
-```bash
-pytest tests/test_regression.py
+- `tests/reports/pytest_result.txt`
+
+## 8. Scripts rapidos
+
+```powershell
+.\scripts\run_etl.ps1 --load-api
+.\scripts\run_clustering.ps1
+.\scripts\run_regression.ps1
+.\scripts\run_dashboard.ps1
+.\scripts\run_tests.ps1
 ```
+
+## 9. Limitaciones conocidas
+
+- el dashboard requiere que clustering y regresion ya hayan generado artefactos
+- el modelo de regresion depende de que `dataset_modelado.csv` tenga continuidad temporal por estacion
+- para Python 3.14 puede ser preferible usar Docker o Python 3.12/3.13 por la dependencia PostgreSQL

@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-calidad_aire_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../db/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ../db/seed_calidad_aire_01_InviernoTemprano.sql:/docker-entrypoint-initdb.d/02_seed_01.sql
+      - ../db/seed_calidad_aire_02_inviernoIIntenso.sql:/docker-entrypoint-initdb.d/03_seed_02.sql
+      - ../db/seed_calidad_aire_03_primavera.sql:/docker-entrypoint-initdb.d/04_seed_03.sql
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/api.Dockerfile
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg2://postgres:postgres@db:5432/calidad_aire_db}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  dashboard:
+    build:
+      context: ..
+      dockerfile: docker/dashboard.Dockerfile
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:

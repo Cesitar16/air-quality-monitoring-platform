@@ -1,3 +1,4 @@
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -12,6 +13,8 @@ API_DIR = ROOT_DIR / "api"
 
 if str(API_DIR) not in sys.path:
     sys.path.insert(0, str(API_DIR))
+
+os.environ.setdefault("DATABASE_URL", "sqlite:///./tests_bootstrap.sqlite3")
 
 from app.database import Base, get_db  # noqa: E402
 from app.main import app  # noqa: E402

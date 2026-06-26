@@ -3,6 +3,7 @@ import pytest
 
 from src.regression import (
     TARGET_SHIFT_STEPS,
+    TARGET_COLUMN,
     cargar_dataset_modelado,
     cargar_modelo,
     clasificar_mp25,
@@ -110,6 +111,26 @@ def test_cargar_dataset_modelado_corrige_mojibake(tmp_path):
     assert "Chill\u00e1n" in set(df["comuna"])
 
 
+def test_cargar_dataset_modelado_completa_columnas_faltantes_del_dry_run(tmp_path):
+    dataset_path = tmp_path / "dataset_modelado.csv"
+    df = _crear_dataset_modelado(rows_per_station=4).drop(
+        columns=[
+            "tipo_sensor",
+            "indice_vulnerabilidad_respiratoria",
+            "emision_maxima_permitida",
+        ]
+    )
+    df["fuente_dato"] = "oficial"
+    df.to_csv(dataset_path, index=False)
+
+    cargado = cargar_dataset_modelado(dataset_path)
+
+    assert "tipo_sensor" in cargado.columns
+    assert "indice_vulnerabilidad_respiratoria" in cargado.columns
+    assert "emision_maxima_permitida" in cargado.columns
+    assert set(cargado["tipo_sensor"]) == {"publico_oficial", "sensor_comunitario_ong"}
+
+
 def test_preparar_dataset_regresion_construye_target_y_lags_sin_fuga():
     df = pd.DataFrame(
         [
@@ -136,12 +157,69 @@ def test_preparar_dataset_regresion_construye_target_y_lags_sin_fuga():
 
     preparado = preparar_dataset_regresion(df, target_shift_steps=4)
 
+    assert preparado.loc[0, TARGET_COLUMN] == 50.0
+    assert preparado.loc[1, TARGET_COLUMN] == 60.0
     assert preparado.loc[0, "mp25_24h_futuro"] == 50.0
-    assert preparado.loc[1, "mp25_24h_futuro"] == 60.0
     assert preparado.loc[2, "lag_1"] == 20.0
     assert preparado.loc[2, "lag_2"] == 10.0
+    assert preparado.loc[2, "mp25_promedio_movil_3"] == 15.0
     assert preparado.loc[2, "rolling_mean_4"] == 15.0
     assert preparado.loc[0, "fecha_hora_objetivo"] == pd.Timestamp("2026-01-02 00:00:00")
+
+
+def test_preparar_dataset_regresion_hace_fallback_por_comuna_si_estacion_no_alcanza():
+    filas = []
+    tiempos_a = [0, 12, 24, 36]
+    tiempos_b = [6, 18, 30, 42]
+
+    for indice, hora in enumerate(tiempos_a):
+        filas.append(
+            {
+                "fecha_hora": pd.Timestamp("2026-01-01 00:00:00") + pd.Timedelta(hours=hora),
+                "comuna": "Talca",
+                "region": "Maule",
+                "codigo_estacion": "STA-A",
+                "tipo_sensor": "publico_oficial",
+                "mp25": 10.0 + indice,
+                "mp10": 20.0 + indice,
+                "so2": 5.0,
+                "no2": 10.0,
+                "velocidad_viento": 2.0,
+                "direccion_viento_grados": 90.0,
+                "temperatura": 12.0,
+                "humedad": 60.0,
+                "indice_vulnerabilidad_respiratoria": 64.2,
+                "emision_maxima_permitida": 420.0,
+            }
+        )
+
+    for indice, hora in enumerate(tiempos_b):
+        filas.append(
+            {
+                "fecha_hora": pd.Timestamp("2026-01-01 00:00:00") + pd.Timedelta(hours=hora),
+                "comuna": "Talca",
+                "region": "Maule",
+                "codigo_estacion": "STA-B",
+                "tipo_sensor": "sensor_comunitario_ong",
+                "mp25": 20.0 + indice,
+                "mp10": 30.0 + indice,
+                "so2": 6.0,
+                "no2": 12.0,
+                "velocidad_viento": 2.5,
+                "direccion_viento_grados": 180.0,
+                "temperatura": 11.0,
+                "humedad": 62.0,
+                "indice_vulnerabilidad_respiratoria": 64.2,
+                "emision_maxima_permitida": 420.0,
+            }
+        )
+
+    preparado = preparar_dataset_regresion(pd.DataFrame(filas), target_shift_steps=4)
+
+    fila_a = preparado.loc[preparado["codigo_estacion"] == "STA-A"].sort_values("fecha_hora").iloc[0]
+    assert pd.notna(fila_a[TARGET_COLUMN])
+    assert pd.isna(fila_a["mp25_24h_estacion"])
+    assert pd.notna(fila_a["mp25_24h_comuna"])
 
 
 def test_entrenar_modelos_devuelve_metricas_para_ambos():
@@ -209,6 +287,13 @@ def test_ejecutar_pipeline_regresion_genera_artefactos_y_predicciones(tmp_path):
     assert metrics_path.exists()
     assert predictions_path.exists()
     assert set(predicciones["tipo_registro"]) == {"evaluacion", "pronostico_24h"}
+    assert {
+        "fecha_hora",
+        "mp25_real_24h",
+        "mp25_predicho_24h",
+        "error_absoluto",
+        "categoria_alerta_predicha",
+    }.issubset(predicciones.columns)
     assert len(
         predicciones.loc[predicciones["tipo_registro"] == "pronostico_24h", "codigo_estacion"].unique()
     ) == 3

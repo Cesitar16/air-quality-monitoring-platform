@@ -1,0 +1,85 @@
+{
+  "algoritmo": "KMeans",
+  "n_clusters": 3,
+  "random_state": 42,
+  "rows": 60,
+  "features": [
+    "mp25",
+    "mp10",
+    "temperatura",
+    "humedad",
+    "velocidad_viento"
+  ],
+  "inercia": 79.51449087743714,
+  "silhouette": 0.4228266575158578,
+  "evaluacion_k": [
+    {
+      "n_clusters": 2,
+      "inercia": 141.76752426258034,
+      "silhouette": 0.5862328564707023
+    },
+    {
+      "n_clusters": 3,
+      "inercia": 79.51449087743714,
+      "silhouette": 0.4228266575158578
+    },
+    {
+      "n_clusters": 4,
+      "inercia": 56.55397076444623,
+      "silhouette": 0.43861666012582934
+    },
+    {
+      "n_clusters": 5,
+      "inercia": 44.6440229643951,
+      "silhouette": 0.4110706100268669
+    },
+    {
+      "n_clusters": 6,
+      "inercia": 35.13665864755804,
+      "silhouette": 0.40256674243604373
+    }
+  ],
+  "centroides": [
+    {
+      "cluster": 0,
+      "mp25": 35.422222222222224,
+      "mp10": 64.8,
+      "temperatura": 13.322222222222223,
+      "humedad": 63.55555555555556,
+      "velocidad_viento": 5.088888888888889
+    },
+    {
+      "cluster": 1,
+      "mp25": 41.30869565217391,
+      "mp10": 72.17826086956522,
+      "temperatura": 8.02608695652174,
+      "humedad": 83.78260869565217,
+      "velocidad_viento": 2.2347826086956526
+    },
+    {
+      "cluster": 2,
+      "mp25": 59.47857142857143,
+      "mp10": 98.96428571428572,
+      "temperatura": 6.589285714285714,
+      "humedad": 87.32142857142857,
+      "velocidad_viento": 1.8392857142857149
+    }
+  ],
+  "niveles_riesgo": [
+    {
+      "cluster": 0,
+      "nivel_riesgo": "Bajo riesgo",
+      "puntaje_riesgo": 0.113759808357158
+    },
+    {
+      "cluster": 1,
+      "nivel_riesgo": "Riesgo moderado",
+      "puntaje_riesgo": 0.23540026077631737
+    },
+    {
+      "cluster": 2,
+      "nivel_riesgo": "Riesgo crítico",
+      "puntaje_riesgo": 0.9899100983149444
+    }
+  ]
+}

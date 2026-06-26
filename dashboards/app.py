@@ -14,6 +14,10 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+from src.clustering import (  # noqa: E402
+    DEFAULT_CLUSTERS_PATH,
+    DEFAULT_SUMMARY_PATH,
+)
 from src.regression import (  # noqa: E402
     DEFAULT_DATASET_PATH,
     DEFAULT_METRICS_PATH,
@@ -43,9 +47,22 @@ def cargar_dataset(path: str) -> pd.DataFrame:
 @st.cache_data(show_spinner=False)
 def cargar_predicciones(path: str) -> pd.DataFrame:
     df = pd.read_csv(path)
-    for columna in ("fecha_hora_base", "fecha_hora_objetivo"):
+    for columna in ("fecha_hora_base", "fecha_hora_objetivo", "fecha_hora"):
         df[columna] = pd.to_datetime(df[columna], errors="coerce")
     return df
+
+
+@st.cache_data(show_spinner=False)
+def cargar_clusters(path: str) -> pd.DataFrame:
+    df = pd.read_csv(path)
+    if "fecha_hora" in df.columns:
+        df["fecha_hora"] = pd.to_datetime(df["fecha_hora"], errors="coerce")
+    return df
+
+
+@st.cache_data(show_spinner=False)
+def cargar_resumen_clusters(path: str) -> pd.DataFrame:
+    return pd.read_csv(path)
 
 
 @st.cache_resource(show_spinner=False)
@@ -98,12 +115,13 @@ def render_vista_ejecutiva(dataset: pd.DataFrame, pronostico: pd.DataFrame) -> N
         .iloc[0]
     )
     prediccion_promedio = pronostico["mp25_predicho"].mean()
+    alertas_altas = int((pronostico["mp25_predicho"] >= 80).sum())
 
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("MP2.5 promedio", f"{dataset['mp25'].mean():.2f}")
     col2.metric("MP2.5 maximo", f"{dataset['mp25'].max():.2f}")
     col3.metric("Comuna critica", comuna_critica["comuna"])
-    col4.metric("Pronostico promedio 24h", f"{prediccion_promedio:.2f}")
+    col4.metric("Pronostico promedio 24h", f"{prediccion_promedio:.2f}", delta=f"{alertas_altas} alertas >= 80")
 
     ranking_comunas = (
         pronostico.groupby(["comuna", "region"], as_index=False)["mp25_predicho"]
@@ -132,36 +150,37 @@ def render_vista_tecnica(
     evaluacion: pd.DataFrame,
     metricas: dict,
     importancia_df: pd.DataFrame,
+    clusters: pd.DataFrame,
+    resumen_clusters: pd.DataFrame,
 ) -> None:
     st.subheader("Vista Tecnica")
-    if evaluacion.empty:
-        st.info("No hay filas de evaluacion para los filtros actuales.")
-        return
-
     render_metricas(metricas)
 
     col1, col2 = st.columns([1.4, 1])
     with col1:
-        scatter = px.scatter(
-            evaluacion,
-            x="mp25_real",
-            y="mp25_predicho",
-            color="comuna",
-            title="Comparacion real vs predicho",
-            labels={"mp25_real": "MP2.5 real", "mp25_predicho": "MP2.5 predicho"},
-            hover_data=["codigo_estacion", "fecha_hora_base", "fecha_hora_objetivo"],
-        )
-        minimo = min(evaluacion["mp25_real"].min(), evaluacion["mp25_predicho"].min())
-        maximo = max(evaluacion["mp25_real"].max(), evaluacion["mp25_predicho"].max())
-        scatter.add_shape(
-            type="line",
-            x0=minimo,
-            y0=minimo,
-            x1=maximo,
-            y1=maximo,
-            line={"dash": "dash"},
-        )
-        st.plotly_chart(scatter, use_container_width=True)
+        if evaluacion.empty:
+            st.info("No hay filas de evaluacion para los filtros actuales.")
+        else:
+            scatter = px.scatter(
+                evaluacion,
+                x="mp25_real",
+                y="mp25_predicho",
+                color="comuna",
+                title="Comparacion real vs predicho",
+                labels={"mp25_real": "MP2.5 real", "mp25_predicho": "MP2.5 predicho"},
+                hover_data=["codigo_estacion", "fecha_hora_base", "fecha_hora_objetivo"],
+            )
+            minimo = min(evaluacion["mp25_real"].min(), evaluacion["mp25_predicho"].min())
+            maximo = max(evaluacion["mp25_real"].max(), evaluacion["mp25_predicho"].max())
+            scatter.add_shape(
+                type="line",
+                x0=minimo,
+                y0=minimo,
+                x1=maximo,
+                y1=maximo,
+                line={"dash": "dash"},
+            )
+            st.plotly_chart(scatter, use_container_width=True)
 
     with col2:
         if importancia_df.empty:
@@ -177,16 +196,46 @@ def render_vista_tecnica(
             )
             st.plotly_chart(grafico_importancia, use_container_width=True)
 
-    st.dataframe(
-        evaluacion.sort_values("fecha_hora_base", ascending=False),
-        use_container_width=True,
-        hide_index=True,
-    )
+    if not resumen_clusters.empty:
+        col3, col4 = st.columns([1, 1.4])
+        with col3:
+            distribucion_clusters = (
+                clusters.groupby("nivel_riesgo", as_index=False)
+                .size()
+                .rename(columns={"size": "cantidad"})
+                .sort_values("cantidad", ascending=False)
+            )
+            grafico_clusters = px.bar(
+                distribucion_clusters,
+                x="nivel_riesgo",
+                y="cantidad",
+                color="nivel_riesgo",
+                title="Distribucion de clusters de riesgo",
+                labels={"nivel_riesgo": "Nivel de riesgo", "cantidad": "Registros"},
+            )
+            st.plotly_chart(grafico_clusters, use_container_width=True)
+
+        with col4:
+            tabla_resumen = resumen_clusters.copy()
+            if "puntaje_riesgo" in tabla_resumen.columns:
+                tabla_resumen = tabla_resumen.sort_values("puntaje_riesgo", ascending=False)
+            st.dataframe(
+                tabla_resumen,
+                use_container_width=True,
+                hide_index=True,
+            )
+
+    if not evaluacion.empty:
+        st.dataframe(
+            evaluacion.sort_values("fecha_hora_base", ascending=False),
+            use_container_width=True,
+            hide_index=True,
+        )
 
 
-def render_vista_ciudadana(pronostico: pd.DataFrame) -> None:
+def render_vista_ciudadana(dataset: pd.DataFrame, pronostico: pd.DataFrame) -> None:
     st.subheader("Vista Ciudadana")
-    if pronostico.empty:
+    if pronostico.empty or dataset.empty:
         st.info("No hay pronosticos para los filtros actuales.")
         return
 
@@ -203,15 +252,23 @@ def render_vista_ciudadana(pronostico: pd.DataFrame) -> None:
     comuna_seleccionada = st.selectbox("Selecciona una comuna", resumen_comuna["comuna"])
     fila = resumen_comuna.loc[resumen_comuna["comuna"] == comuna_seleccionada].iloc[0]
     clasificacion = clasificar_mp25(float(fila["mp25_predicho"]))
+    ultimo_estado = (
+        dataset.loc[dataset["comuna"] == comuna_seleccionada]
+        .sort_values("fecha_hora")
+        .tail(1)
+    )
+    mp25_actual = float(ultimo_estado["mp25"].iloc[0]) if not ultimo_estado.empty else float("nan")
+    clasificacion_actual = clasificar_mp25(mp25_actual) if not pd.isna(mp25_actual) else clasificacion
 
     col1, col2, col3 = st.columns(3)
-    col1.metric("Estado", clasificacion["categoria"])
+    col1.metric("Estado actual", clasificacion_actual["categoria"])
     col2.metric("Pronostico 24h", f"{fila['mp25_predicho']:.2f}")
     col3.metric("Estaciones consideradas", int(fila["estaciones"]))
 
     st.markdown(
         f"""
         **Comuna:** {fila['comuna']} ({fila['region']})  
+        **MP2.5 actual:** {mp25_actual:.2f}  
         **Fecha objetivo:** {fila['fecha_hora_objetivo']}  
         **Color referencial:** {clasificacion['color_referencial']}  
         **Mensaje:** {clasificacion['mensaje_ciudadano']}
@@ -240,24 +297,30 @@ def main() -> None:
     predictions_path = DEFAULT_PREDICTIONS_PATH
     metrics_path = DEFAULT_METRICS_PATH
     model_path = DEFAULT_MODEL_PATH
+    clusters_path = DEFAULT_CLUSTERS_PATH
+    summary_path = DEFAULT_SUMMARY_PATH
 
     faltantes = [
         str(path)
-        for path in (dataset_path, predictions_path, metrics_path, model_path)
+        for path in (dataset_path, predictions_path, metrics_path, clusters_path, summary_path)
         if not Path(path).exists()
     ]
     if faltantes:
         st.error(
-            "Faltan artefactos requeridos. Ejecuta primero `python src/regression.py`.\n\n"
+            "Faltan artefactos requeridos. Ejecuta primero `python src/clustering.py` y `python src/regression.py`.\n\n"
             + "\n".join(faltantes)
         )
         st.stop()
 
     dataset = cargar_dataset(str(dataset_path))
     predicciones = cargar_predicciones(str(predictions_path))
+    clusters = cargar_clusters(str(clusters_path))
+    resumen_clusters = cargar_resumen_clusters(str(summary_path))
     metricas = cargar_metricas(metrics_path)
-    modelo = cargar_modelo_dashboard(str(model_path))
-    importancia_df = obtener_importancia_variables(modelo, top_n=15)
+    importancia_df = pd.DataFrame(columns=["feature", "importance"])
+    if Path(model_path).exists():
+        modelo = cargar_modelo_dashboard(str(model_path))
+        importancia_df = obtener_importancia_variables(modelo, top_n=15)
 
     min_fecha = dataset["fecha_hora"].min().date()
     max_fecha = dataset["fecha_hora"].max().date()
@@ -298,6 +361,28 @@ def main() -> None:
         fecha_fin=fecha_fin,
         columna_fecha="fecha_hora_base",
     )
+    clusters_filtrados = filtrar_por_sidebar(
+        clusters,
+        region=regiones_sel,
+        comuna=comunas_sel,
+        tipo_sensor=tipos_sel,
+        fecha_inicio=fecha_inicio,
+        fecha_fin=fecha_fin,
+        columna_fecha="fecha_hora",
+    )
+    resumen_clusters_filtrado = (
+        clusters_filtrados.groupby(["cluster", "nivel_riesgo"], as_index=False)
+        .agg(
+            cantidad_registros=("codigo_estacion", "size"),
+            mp25=("mp25", "mean"),
+            mp10=("mp10", "mean"),
+            velocidad_viento=("velocidad_viento", "mean"),
+            temperatura=("temperatura", "mean"),
+        )
+        .rename(columns={"mp25": "mp25_promedio", "mp10": "mp10_promedio"})
+    )
+    if resumen_clusters_filtrado.empty:
+        resumen_clusters_filtrado = resumen_clusters.copy()
 
     evaluacion = predicciones_filtradas.loc[
         predicciones_filtradas["tipo_registro"] == "evaluacion"
@@ -312,9 +397,15 @@ def main() -> None:
     with tab1:
         render_vista_ejecutiva(dataset_filtrado, pronostico)
     with tab2:
-        render_vista_tecnica(evaluacion, metricas, importancia_df)
+        render_vista_tecnica(
+            evaluacion,
+            metricas,
+            importancia_df,
+            clusters_filtrados,
+            resumen_clusters_filtrado,
+        )
     with tab3:
-        render_vista_ciudadana(pronostico)
+        render_vista_ciudadana(dataset_filtrado, pronostico)
 
 
 if __name__ == "__main__":

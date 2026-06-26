@@ -1,157 +1,161 @@
-# Monitoreo de Calidad del Aire
+# Air Quality Monitoring Platform
 
-## Contexto del proyecto
+## Resumen
 
-Este proyecto responde a la necesidad de una ONG ambiental y distintos municipios de la zona centro-sur de Chile de centralizar la información sobre calidad del aire. Actualmente los datos suelen estar dispersos, con formatos heterogéneos y tiempos de publicación que dificultan la detección temprana de episodios críticos de contaminación.
+Este repositorio concentra un caso academico de monitoreo de calidad del aire para comunas del centro-sur de Chile. La solucion integra:
 
-La iniciativa busca consolidar comunas, sensores, fuentes industriales y mediciones ambientales en una plataforma común. Esto permite preparar una base sólida para análisis posteriores, integración con dashboards, notebooks y futuros modelos predictivos.
+- ETL reproducible sobre fuentes simuladas
+- API REST con FastAPI y PostgreSQL
+- modelamiento no supervisado para riesgo ambiental
+- regresion supervisada para pronostico de MP2.5 a 24 horas
+- dashboard Streamlit para perfiles ejecutivos, tecnicos y ciudadanos
 
-## Objetivo del proyecto
+## Arquitectura
 
-En esta etapa, el foco es construir una base de datos reproducible en PostgreSQL y un backend REST con FastAPI que permita consultar e insertar información del sistema de monitoreo.
+El flujo principal del proyecto es:
 
-El alcance actual considera:
+```text
+Fuentes raw CSV/XLSX
+        ->
+ETL local
+        ->
+PostgreSQL + API
+        ->
+dataset_modelado.csv
+        ->
+clustering + regresion
+        ->
+artefactos CSV/JSON/joblib
+        ->
+dashboard Streamlit
+```
 
-- levantar la base de datos con Docker
-- cargar el esquema y las semillas del proyecto en el orden correcto
-- exponer endpoints REST simples para las entidades principales
-- dejar documentación Swagger lista para pruebas
+Mas detalle en [docs/03_arquitectura.md](/E:/ProjectsGithub/air-quality-monitoring-platform/docs/03_arquitectura.md).
 
 ## Estructura del repositorio
 
 ```text
-.
-├── api/
-│   ├── app/
-│   │   ├── database.py
-│   │   ├── main.py
-│   │   ├── models.py
-│   │   ├── schemas.py
-│   │   └── routes/
-│   ├── Dockerfile
-│   └── requirements.txt
-├── db/
-│   ├── schema.sql
-│   ├── seed_calidad_aire_01_InviernoTemprano.sql
-│   ├── seed_calidad_aire_02_inviernoIIntenso.sql
-│   └── seed_calidad_aire_03_primavera.sql
-├── docs/
-│   ├── 01_contexto_negocio.md
-│   └── 02_diccionario_datos.md
-├── docker-compose.yml
-├── .env.example
-└── README.md
+api/           API FastAPI y acceso a BD
+dashboards/    app Streamlit, dependencias y README
+data/          datos raw, procesados y README operativo
+db/            schema y seeds de PostgreSQL
+docker/        referencia de despliegue y Dockerfiles auxiliares
+docs/          documentacion formal del proyecto
+etl/           extraccion, transformacion, validacion y carga
+models/        artefactos de clustering y regresion
+notebooks/     EDA, clustering y regresion
+repo/          plantillas para evidencias Git
+scripts/       atajos PowerShell
+src/           logica reutilizable de ciencia de datos
+tests/         pruebas automatizadas y reporte
 ```
 
-## Cómo ejecutar la BD
+## Requisitos
 
-1. Crear el archivo `.env` desde el ejemplo:
+- Python 3.12 o 3.13 recomendado
+- Docker Desktop para levantar PostgreSQL y la API
+- PowerShell para ejecutar los scripts versionados
 
-```bash
-cp .env.example .env
-```
+Nota: en Python 3.14 `psycopg2-binary==2.9.10` puede requerir compilacion local. Para desarrollo rapido se recomienda Python 3.12/3.13 o usar Docker para la API.
 
-En PowerShell:
+## Instalacion
+
+Instalacion general del proyecto:
 
 ```powershell
-Copy-Item .env.example .env
+python -m pip install -r requirements.txt
 ```
 
-2. Levantar solo la base de datos:
+Dependencias solo para dashboard:
 
-```bash
-docker compose up db
+```powershell
+python -m pip install -r dashboards/requirements.txt
 ```
 
-3. PostgreSQL ejecutará automáticamente, en este orden, durante la primera inicialización del volumen:
+## Ejecucion rapida
 
-- `db/schema.sql`
-- `db/seed_calidad_aire_01_InviernoTemprano.sql`
-- `db/seed_calidad_aire_02_inviernoIIntenso.sql`
-- `db/seed_calidad_aire_03_primavera.sql`
+Levantar servicios base:
 
-4. Si modificas el esquema o las semillas y quieres reconstruir la base desde cero:
-
-```bash
-docker compose down -v
-docker compose up db
-```
-
-## Cómo ejecutar el backend
-
-1. Levantar todo el proyecto:
-
-```bash
+```powershell
 docker compose up --build
 ```
 
-2. Acceder a:
-
-- API: `http://localhost:8000`
-- Swagger: `http://localhost:8000/docs`
-
-3. Endpoints disponibles:
-
-- `GET /`
-- `GET /health`
-- `GET /comunas`
-- `GET /comunas/{id_comuna}`
-- `GET /estaciones`
-- `GET /estaciones/{id_estacion}`
-- `GET /industrias`
-- `GET /industrias/{id_industria}`
-- `GET /monitoreo`
-- `GET /monitoreo/{id_monitoreo}`
-- `POST /monitoreo`
-
-4. Filtros opcionales para `GET /monitoreo`:
-
-- `comuna`
-- `region`
-- `fecha_inicio`
-- `fecha_fin`
-- `limit`
-
-Ejemplo:
-
-```bash
-curl "http://localhost:8000/monitoreo?comuna=Talca&limit=10"
-```
-
-5. Ejemplo de `POST /monitoreo`:
-
-```bash
-curl -X POST "http://localhost:8000/monitoreo" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "fecha_hora": "2026-06-18T10:00:00",
-    "id_estacion": 1,
-    "mp25": 42.5,
-    "mp10": 75.1,
-    "so2": 8.3,
-    "no2": 19.7,
-    "velocidad_viento": 4.8,
-    "direccion_viento_grados": 180,
-    "temperatura": 14.2,
-    "humedad": 62.0
-  }'
-```
-
-En PowerShell:
+Ejecutar ETL:
 
 ```powershell
-$body = @{
-  fecha_hora = "2026-06-18T10:00:00"
-  id_estacion = 1
-  mp25 = 42.5
-  mp10 = 75.1
-  so2 = 8.3
-  no2 = 19.7
-  velocidad_viento = 4.8
-  direccion_viento_grados = 180
-  temperatura = 14.2
-  humedad = 62.0
-} | ConvertTo-Json
-
-Invoke-RestMethod -Method Post -Uri "http://localhost:8000/monitoreo" -ContentType "application/json" -Body $body
+.\scripts\run_etl.ps1 --load-api
 ```
+
+Ejecutar clustering:
+
+```powershell
+.\scripts\run_clustering.ps1
+```
+
+Ejecutar regresion:
+
+```powershell
+.\scripts\run_regression.ps1
+```
+
+Levantar dashboard:
+
+```powershell
+.\scripts\run_dashboard.ps1
+```
+
+Ejecutar pruebas:
+
+```powershell
+.\scripts\run_tests.ps1
+```
+
+## Artefactos principales
+
+ETL:
+
+- `data/processed/mediciones_limpias.csv`
+- `data/processed/mediciones_validas.csv`
+- `data/processed/industrias_limpias.csv`
+- `data/processed/clima_limpio.csv`
+- `data/processed/errores_etl.csv`
+- `data/processed/dataset_modelado.csv`
+
+Clustering:
+
+- `data/processed/clusters_riesgo_ambiental.csv`
+- `data/processed/resumen_clusters.csv`
+- `models/clustering/kmeans_riesgo_ambiental.joblib`
+- `models/clustering/scaler_clustering.joblib`
+- `models/clustering/metricas_clustering.json`
+
+Regresion:
+
+- `data/processed/predicciones_mp25_24h.csv`
+- `models/regression/modelo_mp25_24h.joblib`
+- `models/regression/metricas_regresion.json`
+
+## Documentacion
+
+- [docs/05_etl_pipeline.md](/E:/ProjectsGithub/air-quality-monitoring-platform/docs/05_etl_pipeline.md)
+- [docs/06_modelamiento_clustering.md](/E:/ProjectsGithub/air-quality-monitoring-platform/docs/06_modelamiento_clustering.md)
+- [docs/07_modelamiento_regresion.md](/E:/ProjectsGithub/air-quality-monitoring-platform/docs/07_modelamiento_regresion.md)
+- [docs/08_dashboard.md](/E:/ProjectsGithub/air-quality-monitoring-platform/docs/08_dashboard.md)
+- [docs/09_manual_usuario.md](/E:/ProjectsGithub/air-quality-monitoring-platform/docs/09_manual_usuario.md)
+
+## Validacion sugerida
+
+```powershell
+python -m pytest -q
+python etl/run_pipeline.py --dry-run
+python src/clustering.py
+python src/regression.py
+streamlit run dashboards/app.py
+```
+
+## Limitaciones
+
+- Las fuentes son simuladas y no representan mediciones oficiales actuales.
+- El clustering entrega perfiles relativos de riesgo, no categorias regulatorias.
+- La regresion usa un horizonte fijo de 24 horas con frecuencia de 6 horas.
+- El dashboard depende de artefactos previamente generados por ETL y modelamiento.

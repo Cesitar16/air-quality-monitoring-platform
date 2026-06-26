@@ -1,12 +1,25 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Sequence, Tuple
+import argparse
+import json
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
+import joblib
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import StandardScaler
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+DEFAULT_DATASET_PATH = ROOT_DIR / "data" / "processed" / "dataset_modelado.csv"
+DEFAULT_CLUSTERS_PATH = ROOT_DIR / "data" / "processed" / "clusters_riesgo_ambiental.csv"
+DEFAULT_SUMMARY_PATH = ROOT_DIR / "data" / "processed" / "resumen_clusters.csv"
+DEFAULT_MODEL_PATH = ROOT_DIR / "models" / "clustering" / "kmeans_riesgo_ambiental.joblib"
+DEFAULT_SCALER_PATH = ROOT_DIR / "models" / "clustering" / "scaler_clustering.joblib"
+DEFAULT_METRICS_PATH = ROOT_DIR / "models" / "clustering" / "metricas_clustering.json"
 
 
 VARIABLES_SUGERIDAS = [
@@ -31,6 +44,18 @@ PESOS_RIESGO = {
     "emision_maxima_permitida": (0.04, "directa"),
     "velocidad_viento": (0.04, "inversa"),
 }
+
+
+@dataclass
+class ResultadoClustering:
+    dataset_original: pd.DataFrame
+    dataset_modelo: pd.DataFrame
+    columnas_utilizadas: List[str]
+    modelo: KMeans
+    scaler: StandardScaler
+    clusters: pd.DataFrame
+    resumen_clusters: pd.DataFrame
+    metricas: dict[str, Any]
 
 
 def preparar_variables_clustering(
@@ -536,3 +561,299 @@ def resumir_clusters(
         primeras_columnas
         + columnas_restantes
     ]
+
+
+def _asegurar_directorio(path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+
+def cargar_dataset_clustering(
+    path: str | Path = DEFAULT_DATASET_PATH,
+) -> pd.DataFrame:
+    """
+    Carga el dataset base para clustering desde CSV local.
+    """
+    dataset_path = Path(path)
+
+    if not dataset_path.exists():
+        raise FileNotFoundError(
+            "No existe el dataset de modelado para clustering: "
+            + str(dataset_path)
+        )
+
+    df = pd.read_csv(dataset_path)
+
+    if df.empty:
+        raise ValueError(
+            "El dataset de modelado está vacío."
+        )
+
+    if "fecha_hora" in df.columns:
+        df["fecha_hora"] = pd.to_datetime(
+            df["fecha_hora"],
+            errors="coerce",
+        )
+
+    return df
+
+
+def guardar_dataframe(
+    df: pd.DataFrame,
+    path: str | Path,
+) -> Path:
+    """
+    Guarda un DataFrame en CSV UTF-8.
+    """
+    output_path = Path(path)
+    _asegurar_directorio(output_path)
+    df.to_csv(
+        output_path,
+        index=False,
+        encoding="utf-8",
+    )
+    return output_path
+
+
+def guardar_metricas_clustering(
+    metricas: dict[str, Any],
+    path: str | Path = DEFAULT_METRICS_PATH,
+) -> Path:
+    """
+    Persiste métricas y metadatos del modelo K-Means.
+    """
+    output_path = Path(path)
+    _asegurar_directorio(output_path)
+
+    with output_path.open(
+        "w",
+        encoding="utf-8",
+    ) as file:
+        json.dump(
+            metricas,
+            file,
+            ensure_ascii=False,
+            indent=2,
+        )
+
+    return output_path
+
+
+def guardar_artefactos_clustering(
+    modelo: KMeans,
+    scaler: StandardScaler,
+    model_path: str | Path = DEFAULT_MODEL_PATH,
+    scaler_path: str | Path = DEFAULT_SCALER_PATH,
+) -> tuple[Path, Path]:
+    """
+    Guarda el modelo K-Means y el scaler asociado.
+    """
+    output_model_path = Path(model_path)
+    output_scaler_path = Path(scaler_path)
+
+    _asegurar_directorio(output_model_path)
+    _asegurar_directorio(output_scaler_path)
+
+    joblib.dump(
+        modelo,
+        output_model_path,
+    )
+    joblib.dump(
+        scaler,
+        output_scaler_path,
+    )
+
+    return output_model_path, output_scaler_path
+
+
+def ejecutar_pipeline_clustering(
+    dataset_path: str | Path = DEFAULT_DATASET_PATH,
+    clusters_out: str | Path = DEFAULT_CLUSTERS_PATH,
+    summary_out: str | Path = DEFAULT_SUMMARY_PATH,
+    model_out: str | Path = DEFAULT_MODEL_PATH,
+    scaler_out: str | Path = DEFAULT_SCALER_PATH,
+    metrics_out: str | Path = DEFAULT_METRICS_PATH,
+    n_clusters: int = 3,
+    random_state: int = 42,
+) -> ResultadoClustering:
+    """
+    Ejecuta el flujo completo de clustering y exporta artefactos.
+    """
+    dataset = cargar_dataset_clustering(
+        dataset_path,
+    )
+
+    X_scaled, scaler, datos_modelo, columnas_utilizadas = escalar_variables(
+        dataset,
+    )
+
+    tabla_k = evaluar_numero_clusters(
+        X_scaled,
+        min_clusters=2,
+        max_clusters=min(6, max(2, len(dataset) - 1)),
+        random_state=random_state,
+    )
+
+    modelo = entrenar_kmeans(
+        X_scaled,
+        n_clusters=n_clusters,
+        random_state=random_state,
+    )
+
+    clusters = agregar_clusters(
+        dataset,
+        modelo,
+        X_scaled,
+    )
+    clusters = asignar_etiquetas_riesgo(
+        clusters,
+    )
+    resumen_clusters = resumir_clusters(
+        clusters,
+    )
+    centroides = obtener_centroides(
+        modelo,
+        scaler,
+        columnas_utilizadas,
+    )
+
+    fila_k = tabla_k.loc[
+        tabla_k["n_clusters"] == n_clusters
+    ]
+
+    metricas = {
+        "algoritmo": "KMeans",
+        "n_clusters": n_clusters,
+        "random_state": random_state,
+        "rows": int(len(dataset)),
+        "features": columnas_utilizadas,
+        "inercia": float(modelo.inertia_),
+        "silhouette": (
+            float(fila_k["silhouette"].iloc[0])
+            if not fila_k.empty
+            else float("nan")
+        ),
+        "evaluacion_k": tabla_k.to_dict(
+            orient="records"
+        ),
+        "centroides": centroides.to_dict(
+            orient="records"
+        ),
+        "niveles_riesgo": (
+            resumen_clusters[
+                ["cluster", "nivel_riesgo", "puntaje_riesgo"]
+            ]
+            .to_dict(orient="records")
+        ),
+    }
+
+    guardar_dataframe(
+        clusters,
+        clusters_out,
+    )
+    guardar_dataframe(
+        resumen_clusters,
+        summary_out,
+    )
+    guardar_artefactos_clustering(
+        modelo,
+        scaler,
+        model_out,
+        scaler_out,
+    )
+    guardar_metricas_clustering(
+        metricas,
+        metrics_out,
+    )
+
+    return ResultadoClustering(
+        dataset_original=dataset,
+        dataset_modelo=datos_modelo,
+        columnas_utilizadas=columnas_utilizadas,
+        modelo=modelo,
+        scaler=scaler,
+        clusters=clusters,
+        resumen_clusters=resumen_clusters,
+        metricas=metricas,
+    )
+
+
+def _parse_args(
+    argv: Optional[List[str]] = None,
+) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Entrena clustering K-Means para riesgo ambiental."
+    )
+    parser.add_argument(
+        "--dataset",
+        default=str(DEFAULT_DATASET_PATH),
+    )
+    parser.add_argument(
+        "--clusters-out",
+        default=str(DEFAULT_CLUSTERS_PATH),
+    )
+    parser.add_argument(
+        "--summary-out",
+        default=str(DEFAULT_SUMMARY_PATH),
+    )
+    parser.add_argument(
+        "--model-out",
+        default=str(DEFAULT_MODEL_PATH),
+    )
+    parser.add_argument(
+        "--scaler-out",
+        default=str(DEFAULT_SCALER_PATH),
+    )
+    parser.add_argument(
+        "--metrics-out",
+        default=str(DEFAULT_METRICS_PATH),
+    )
+    parser.add_argument(
+        "--n-clusters",
+        type=int,
+        default=3,
+    )
+    return parser.parse_args(argv)
+
+
+def main(
+    argv: Optional[List[str]] = None,
+) -> None:
+    args = _parse_args(argv)
+    resultado = ejecutar_pipeline_clustering(
+        dataset_path=args.dataset,
+        clusters_out=args.clusters_out,
+        summary_out=args.summary_out,
+        model_out=args.model_out,
+        scaler_out=args.scaler_out,
+        metrics_out=args.metrics_out,
+        n_clusters=args.n_clusters,
+    )
+
+    print(
+        "[Clustering] Registros procesados:",
+        len(resultado.dataset_original),
+    )
+    print(
+        "[Clustering] Variables utilizadas:",
+        ", ".join(resultado.columnas_utilizadas),
+    )
+    print(
+        "[Clustering] Inercia:",
+        f"{resultado.metricas['inercia']:.2f}",
+    )
+    print(
+        "[Clustering] Silhouette:",
+        f"{resultado.metricas['silhouette']:.4f}",
+    )
+    print(
+        "[Clustering] Resumen guardado en:",
+        Path(args.summary_out),
+    )
+    print(
+        "[Clustering] Clusters guardados en:",
+        Path(args.clusters_out),
+    )
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,20 @@
+{
+  "horizon_hours": 24,
+  "sampling_frequency_hours": 6,
+  "target_shift_steps": 4,
+  "train_rows": 22,
+  "test_rows": 6,
+  "best_model": "random_forest",
+  "models": {
+    "linear_regression": {
+      "mae": 133.66883844398575,
+      "rmse": 147.47138851399862,
+      "r2": -169.03022531574558
+    },
+    "random_forest": {
+      "mae": 8.374499999999996,
+      "rmse": 10.024910064249756,
+      "r2": 0.2142732083858192
+    }
+  }
+}

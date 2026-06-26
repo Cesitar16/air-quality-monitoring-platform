@@ -29,14 +29,18 @@ if str(API_DIR) not in sys.path:
 from app.services.calidad_aire_service import clasificar_calidad_aire_mp25  # noqa: E402
 
 DEFAULT_DATASET_PATH = ROOT_DIR / "data" / "processed" / "dataset_modelado.csv"
-DEFAULT_MODEL_PATH = ROOT_DIR / "models" / "modelo_mp25_24h.joblib"
-DEFAULT_METRICS_PATH = ROOT_DIR / "models" / "metricas_regresion.json"
+DEFAULT_MODEL_PATH = ROOT_DIR / "models" / "regression" / "modelo_mp25_24h.joblib"
+DEFAULT_METRICS_PATH = ROOT_DIR / "models" / "regression" / "metricas_regresion.json"
 DEFAULT_PREDICTIONS_PATH = ROOT_DIR / "data" / "processed" / "predicciones_mp25_24h.csv"
+LEGACY_MODEL_PATH = ROOT_DIR / "models" / "modelo_mp25_24h.joblib"
+LEGACY_METRICS_PATH = ROOT_DIR / "models" / "metricas_regresion.json"
 
 TARGET_HORIZON_HOURS = 24
 SAMPLING_FREQUENCY_HOURS = 6
 TARGET_SHIFT_STEPS = TARGET_HORIZON_HOURS // SAMPLING_FREQUENCY_HOURS
 TRAIN_FRACTION = 0.8
+TARGET_COLUMN = "mp25_24h"
+LEGACY_TARGET_COLUMN = "mp25_24h_futuro"
 
 REQUIRED_COLUMNS = [
     "fecha_hora",
@@ -73,6 +77,7 @@ NUMERIC_FEATURES = [
     "dia_semana",
     "lag_1",
     "lag_2",
+    "mp25_promedio_movil_3",
     "rolling_mean_4",
     "direccion_viento_sin",
     "direccion_viento_cos",
@@ -88,19 +93,28 @@ PREDICCIONES_COLUMNS = [
     "tipo_registro",
     "fecha_hora_base",
     "fecha_hora_objetivo",
+    "fecha_hora",
     "codigo_estacion",
     "comuna",
     "region",
     "tipo_sensor",
     "mp25_actual",
     "mp25_real",
+    "mp25_real_24h",
     "mp25_predicho",
+    "mp25_predicho_24h",
+    "error_absoluto",
     "categoria_predicha",
+    "categoria_alerta_predicha",
     "mensaje_ciudadano",
     "color_referencial",
 ]
 
 MOJIBAKE_MARKERS = ("\u00c3", "\u00c2", "\u00e2")
+DEFAULT_CONTEXT_VALUES = {
+    "indice_vulnerabilidad_respiratoria": 50.0,
+    "emision_maxima_permitida": 200.0,
+}
 
 
 @dataclass
@@ -125,6 +139,19 @@ class ResultadoRegresion:
 
 def _asegurar_directorio(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
+
+
+def _resolver_ruta_lectura(path: str | Path, fallback: str | Path | None = None) -> Path:
+    ruta = Path(path)
+    if ruta.exists():
+        return ruta
+
+    if fallback is not None:
+        ruta_fallback = Path(fallback)
+        if ruta_fallback.exists():
+            return ruta_fallback
+
+    return ruta
 
 
 def clasificar_mp25(valor: float) -> dict[str, str]:
@@ -156,6 +183,48 @@ def normalizar_etiquetas_dataset(df: pd.DataFrame) -> pd.DataFrame:
     return df_normalizado
 
 
+def inferir_tipo_sensor(df: pd.DataFrame) -> pd.Series:
+    """Infer sensor type when the dry-run dataset does not include it."""
+    fuente = df.get("fuente_dato", pd.Series(index=df.index, dtype="object")).fillna("")
+    codigo = df.get("codigo_estacion", pd.Series(index=df.index, dtype="object")).fillna("")
+
+    fuente = fuente.astype(str).str.lower()
+    codigo = codigo.astype(str).str.upper()
+
+    tipo_sensor = pd.Series("sensor_desconocido", index=df.index, dtype="object")
+    mascara_oficial = (
+        fuente.isin(["oficial", "publico_oficial"])
+        | codigo.str.contains("-OF-")
+        | codigo.str.startswith("OF-")
+    )
+    mascara_ong = (
+        fuente.isin(["comunitario", "sensor_comunitario_ong", "ong"])
+        | codigo.str.contains("ONG")
+    )
+
+    tipo_sensor.loc[mascara_oficial] = "publico_oficial"
+    tipo_sensor.loc[mascara_ong] = "sensor_comunitario_ong"
+    return tipo_sensor
+
+
+def completar_columnas_requeridas(df: pd.DataFrame) -> pd.DataFrame:
+    """Complete optional context columns so regression also works after dry-run ETL."""
+    dataset = df.copy()
+
+    if "tipo_sensor" not in dataset.columns:
+        dataset["tipo_sensor"] = inferir_tipo_sensor(dataset)
+    else:
+        dataset["tipo_sensor"] = dataset["tipo_sensor"].fillna(inferir_tipo_sensor(dataset))
+
+    for columna, valor_default in DEFAULT_CONTEXT_VALUES.items():
+        if columna not in dataset.columns:
+            dataset[columna] = valor_default
+        else:
+            dataset[columna] = pd.to_numeric(dataset[columna], errors="coerce").fillna(valor_default)
+
+    return dataset
+
+
 def validar_dataset_modelado(df: pd.DataFrame) -> None:
     """Validate the minimum schema required for training."""
     faltantes = [columna for columna in REQUIRED_COLUMNS if columna not in df.columns]
@@ -173,6 +242,7 @@ def cargar_dataset_modelado(path: str | Path = DEFAULT_DATASET_PATH) -> pd.DataF
 
     df = pd.read_csv(dataset_path)
     df = normalizar_etiquetas_dataset(df)
+    df = completar_columnas_requeridas(df)
     validar_dataset_modelado(df)
     df["fecha_hora"] = pd.to_datetime(df["fecha_hora"], errors="coerce")
     if df["fecha_hora"].isna().any():
@@ -203,10 +273,29 @@ def preparar_dataset_regresion(
     grupo_estacion = dataset.groupby("codigo_estacion", group_keys=False, sort=False)
     dataset["lag_1"] = grupo_estacion["mp25"].shift(1)
     dataset["lag_2"] = grupo_estacion["mp25"].shift(2)
+    dataset["mp25_promedio_movil_3"] = grupo_estacion["mp25"].transform(
+        lambda serie: serie.shift(1).rolling(window=3, min_periods=1).mean()
+    )
     dataset["rolling_mean_4"] = grupo_estacion["mp25"].transform(
         lambda serie: serie.shift(1).rolling(window=4, min_periods=1).mean()
     )
-    dataset["mp25_24h_futuro"] = grupo_estacion["mp25"].shift(-target_shift_steps)
+    dataset["mp25_24h_estacion"] = grupo_estacion["mp25"].shift(-target_shift_steps)
+
+    serie_comuna = (
+        dataset.groupby(["comuna", "fecha_hora"], as_index=False)["mp25"]
+        .mean()
+        .sort_values(["comuna", "fecha_hora"])
+    )
+    serie_comuna["mp25_24h_comuna"] = (
+        serie_comuna.groupby("comuna", sort=False)["mp25"].shift(-target_shift_steps)
+    )
+    dataset = dataset.merge(
+        serie_comuna[["comuna", "fecha_hora", "mp25_24h_comuna"]],
+        on=["comuna", "fecha_hora"],
+        how="left",
+    )
+    dataset[TARGET_COLUMN] = dataset["mp25_24h_estacion"].fillna(dataset["mp25_24h_comuna"])
+    dataset[LEGACY_TARGET_COLUMN] = dataset[TARGET_COLUMN]
     dataset["fecha_hora_objetivo"] = dataset["fecha_hora"] + pd.Timedelta(hours=TARGET_HORIZON_HOURS)
 
     return dataset
@@ -214,7 +303,7 @@ def preparar_dataset_regresion(
 
 def filtrar_dataset_entrenamiento(df: pd.DataFrame) -> pd.DataFrame:
     """Keep rows that have a known target for supervised learning."""
-    dataset = df.loc[df["mp25_24h_futuro"].notna()].copy()
+    dataset = df.loc[df[TARGET_COLUMN].notna()].copy()
     dataset = dataset.sort_values(["fecha_hora", "codigo_estacion"]).reset_index(drop=True)
     if len(dataset) < 2:
         raise ValueError("No hay suficientes filas con objetivo para entrenar el modelo.")
@@ -301,9 +390,9 @@ def entrenar_modelos(
     modelos = construir_modelos(random_state=random_state)
     columnas_features = obtener_columnas_features()
     x_train = train_df[columnas_features]
-    y_train = train_df["mp25_24h_futuro"]
+    y_train = train_df[TARGET_COLUMN]
     x_test = test_df[columnas_features]
-    y_test = test_df["mp25_24h_futuro"]
+    y_test = test_df[TARGET_COLUMN]
 
     resultados: dict[str, ResultadoEntrenamiento] = {}
     for nombre, pipeline in modelos.items():
@@ -334,6 +423,18 @@ def _aplicar_clasificacion_predicha(predicciones: pd.Series) -> pd.DataFrame:
     return pd.DataFrame(clasificaciones.tolist(), index=predicciones.index)
 
 
+def _enriquecer_exporte_predicciones(df: pd.DataFrame) -> pd.DataFrame:
+    exportable = df.copy()
+    exportable["fecha_hora"] = exportable["fecha_hora_objetivo"]
+    exportable["mp25_real_24h"] = exportable["mp25_real"]
+    exportable["mp25_predicho_24h"] = exportable["mp25_predicho"]
+    exportable["error_absoluto"] = (
+        exportable["mp25_real_24h"] - exportable["mp25_predicho_24h"]
+    ).abs()
+    exportable["categoria_alerta_predicha"] = exportable["categoria_predicha"]
+    return exportable[PREDICCIONES_COLUMNS]
+
+
 def construir_predicciones_evaluacion(
     test_df: pd.DataFrame,
     predicciones: np.ndarray,
@@ -348,14 +449,14 @@ def construir_predicciones_evaluacion(
             "region",
             "tipo_sensor",
             "mp25",
-            "mp25_24h_futuro",
+            TARGET_COLUMN,
         ]
     ].copy()
     base = base.rename(
         columns={
             "fecha_hora": "fecha_hora_base",
             "mp25": "mp25_actual",
-            "mp25_24h_futuro": "mp25_real",
+            TARGET_COLUMN: "mp25_real",
         }
     )
     base["tipo_registro"] = "evaluacion"
@@ -364,7 +465,7 @@ def construir_predicciones_evaluacion(
     base["categoria_predicha"] = clasificacion["categoria"]
     base["mensaje_ciudadano"] = clasificacion["mensaje_ciudadano"]
     base["color_referencial"] = clasificacion["color_referencial"]
-    return base[PREDICCIONES_COLUMNS]
+    return _enriquecer_exporte_predicciones(base)
 
 
 def construir_pronosticos_24h(
@@ -408,7 +509,7 @@ def construir_pronosticos_24h(
     pronosticos["categoria_predicha"] = clasificacion["categoria"]
     pronosticos["mensaje_ciudadano"] = clasificacion["mensaje_ciudadano"]
     pronosticos["color_referencial"] = clasificacion["color_referencial"]
-    return pronosticos[PREDICCIONES_COLUMNS]
+    return _enriquecer_exporte_predicciones(pronosticos)
 
 
 def guardar_modelo(modelo: Pipeline, path: str | Path = DEFAULT_MODEL_PATH) -> Path:
@@ -421,7 +522,7 @@ def guardar_modelo(modelo: Pipeline, path: str | Path = DEFAULT_MODEL_PATH) -> P
 
 def cargar_modelo(path: str | Path = DEFAULT_MODEL_PATH) -> Pipeline:
     """Load the fitted regression pipeline."""
-    return joblib.load(Path(path))
+    return joblib.load(_resolver_ruta_lectura(path, LEGACY_MODEL_PATH))
 
 
 def guardar_metricas(metricas: dict[str, Any], path: str | Path = DEFAULT_METRICS_PATH) -> Path:
@@ -435,7 +536,7 @@ def guardar_metricas(metricas: dict[str, Any], path: str | Path = DEFAULT_METRIC
 
 def cargar_metricas(path: str | Path = DEFAULT_METRICS_PATH) -> dict[str, Any]:
     """Load the saved metrics JSON."""
-    with Path(path).open(encoding="utf-8") as file:
+    with _resolver_ruta_lectura(path, LEGACY_METRICS_PATH).open(encoding="utf-8") as file:
         return json.load(file)
 
 
