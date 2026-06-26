@@ -1,0 +1,17 @@
+codigo_estacion_raw,codigo_unico_api,comuna,region,fuente_dato,tipo_sensor_api
+OF-CHI-001,SEN-CHI-OF-001,Chillán,Ñuble,oficial,publico_oficial
+OF-CON-001,SEN-CON-OF-001,Concepción,Biobío,oficial,publico_oficial
+OF-COR-001,SEN-COR-OF-001,Coronel,Biobío,oficial,publico_oficial
+OF-CUR-001,SEN-CUR-OF-001,Curicó,Maule,oficial,publico_oficial
+OF-HUA-001,SEN-HUA-OF-001,Hualpén,Biobío,oficial,publico_oficial
+OF-RAN-001,SEN-RAN-OF-001,Rancagua,O'Higgins,oficial,publico_oficial
+OF-SCA-001,SEN-SCA-OF-001,San Carlos,Ñuble,oficial,publico_oficial
+OF-TAL-001,SEN-TAL-OF-001,Talca,Maule,oficial,publico_oficial
+ONG-CHI-001,SEN-CHI-ONG-001,Chillán,Ñuble,comunitaria,sensor_comunitario_ong
+ONG-CON-001,SEN-CON-ONG-001,Concepción,Biobío,comunitaria,sensor_comunitario_ong
+ONG-COR-001,SEN-COR-ONG-001,Coronel,Biobío,comunitaria,sensor_comunitario_ong
+ONG-CUR-001,SEN-CUR-ONG-001,Curicó,Maule,comunitaria,sensor_comunitario_ong
+ONG-HUA-001,SEN-HUA-ONG-001,Hualpén,Biobío,comunitaria,sensor_comunitario_ong
+ONG-RAN-001,SEN-RAN-ONG-001,Rancagua,O'Higgins,comunitaria,sensor_comunitario_ong
+ONG-SCA-001,SEN-SCA-ONG-001,San Carlos,Ñuble,comunitaria,sensor_comunitario_ong
+ONG-TAL-001,SEN-TAL-ONG-001,Talca,Maule,comunitaria,sensor_comunitario_ong
