@@ -12,6 +12,7 @@ from typing import Any
 import joblib
 import numpy as np
 import pandas as pd
+from sklearn.base import clone
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.impute import SimpleImputer
@@ -19,6 +20,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.model_selection import TimeSeriesSplit
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 API_DIR = ROOT_DIR / "api"
@@ -41,6 +43,7 @@ TARGET_SHIFT_STEPS = TARGET_HORIZON_HOURS // SAMPLING_FREQUENCY_HOURS
 TRAIN_FRACTION = 0.8
 TARGET_COLUMN = "mp25_24h"
 LEGACY_TARGET_COLUMN = "mp25_24h_futuro"
+DEFAULT_TIME_SERIES_SPLITS = 3
 
 REQUIRED_COLUMNS = [
     "fecha_hora",
@@ -77,8 +80,11 @@ NUMERIC_FEATURES = [
     "dia_semana",
     "lag_1",
     "lag_2",
+    "lag_3",
+    "delta_mp25",
     "mp25_promedio_movil_3",
-    "rolling_mean_4",
+    "rolling_mean_6",
+    "rolling_mean_12",
     "direccion_viento_sin",
     "direccion_viento_cos",
 ]
@@ -87,6 +93,7 @@ CATEGORICAL_FEATURES = [
     "tipo_sensor",
     "comuna",
     "region",
+    "estacion_del_ano",
 ]
 
 PREDICCIONES_COLUMNS = [
@@ -114,6 +121,20 @@ MOJIBAKE_MARKERS = ("\u00c3", "\u00c2", "\u00e2")
 DEFAULT_CONTEXT_VALUES = {
     "indice_vulnerabilidad_respiratoria": 50.0,
     "emision_maxima_permitida": 200.0,
+}
+SEASON_BY_MONTH = {
+    12: "verano",
+    1: "verano",
+    2: "verano",
+    3: "otono",
+    4: "otono",
+    5: "otono",
+    6: "invierno",
+    7: "invierno",
+    8: "invierno",
+    9: "primavera",
+    10: "primavera",
+    11: "primavera",
 }
 
 
@@ -225,6 +246,12 @@ def completar_columnas_requeridas(df: pd.DataFrame) -> pd.DataFrame:
     return dataset
 
 
+def obtener_estacion_del_ano(fechas: pd.Series) -> pd.Series:
+    """Map each timestamp month to a season in the southern hemisphere."""
+    meses = pd.to_datetime(fechas, errors="coerce").dt.month
+    return meses.map(SEASON_BY_MONTH).fillna("desconocida")
+
+
 def validar_dataset_modelado(df: pd.DataFrame) -> None:
     """Validate the minimum schema required for training."""
     faltantes = [columna for columna in REQUIRED_COLUMNS if columna not in df.columns]
@@ -265,6 +292,7 @@ def preparar_dataset_regresion(
     dataset["dia"] = dataset["fecha_hora"].dt.day
     dataset["mes"] = dataset["fecha_hora"].dt.month
     dataset["dia_semana"] = dataset["fecha_hora"].dt.dayofweek
+    dataset["estacion_del_ano"] = obtener_estacion_del_ano(dataset["fecha_hora"])
 
     angulo = np.deg2rad(pd.to_numeric(dataset["direccion_viento_grados"], errors="coerce"))
     dataset["direccion_viento_sin"] = np.sin(angulo)
@@ -273,11 +301,16 @@ def preparar_dataset_regresion(
     grupo_estacion = dataset.groupby("codigo_estacion", group_keys=False, sort=False)
     dataset["lag_1"] = grupo_estacion["mp25"].shift(1)
     dataset["lag_2"] = grupo_estacion["mp25"].shift(2)
+    dataset["lag_3"] = grupo_estacion["mp25"].shift(3)
+    dataset["delta_mp25"] = dataset["mp25"] - dataset["lag_1"]
     dataset["mp25_promedio_movil_3"] = grupo_estacion["mp25"].transform(
         lambda serie: serie.shift(1).rolling(window=3, min_periods=1).mean()
     )
-    dataset["rolling_mean_4"] = grupo_estacion["mp25"].transform(
-        lambda serie: serie.shift(1).rolling(window=4, min_periods=1).mean()
+    dataset["rolling_mean_6"] = grupo_estacion["mp25"].transform(
+        lambda serie: serie.shift(1).rolling(window=6, min_periods=1).mean()
+    )
+    dataset["rolling_mean_12"] = grupo_estacion["mp25"].transform(
+        lambda serie: serie.shift(1).rolling(window=12, min_periods=1).mean()
     )
     dataset["mp25_24h_estacion"] = grupo_estacion["mp25"].shift(-target_shift_steps)
 
@@ -409,6 +442,51 @@ def entrenar_modelos(
             predicciones_test=predicciones,
         )
     return resultados
+
+
+def evaluar_modelos_time_series_cv(
+    train_df: pd.DataFrame,
+    random_state: int = 42,
+    n_splits: int = DEFAULT_TIME_SERIES_SPLITS,
+) -> dict[str, dict[str, Any]]:
+    """Optionally evaluate candidate models with TimeSeriesSplit on the training window."""
+    if len(train_df) < (n_splits + 1) * 2:
+        return {}
+
+    columnas_features = obtener_columnas_features()
+    x_train = train_df[columnas_features].reset_index(drop=True)
+    y_train = train_df[TARGET_COLUMN].reset_index(drop=True)
+
+    splitter = TimeSeriesSplit(n_splits=n_splits)
+    modelos = construir_modelos(random_state=random_state)
+    resumen_cv: dict[str, dict[str, Any]] = {}
+
+    for nombre, pipeline in modelos.items():
+        metricas_folds: list[dict[str, float]] = []
+
+        for fold, (train_idx, valid_idx) in enumerate(splitter.split(x_train), start=1):
+            modelo_fold = clone(pipeline)
+            modelo_fold.fit(x_train.iloc[train_idx], y_train.iloc[train_idx])
+            predicciones = modelo_fold.predict(x_train.iloc[valid_idx])
+            y_valid = y_train.iloc[valid_idx]
+            metricas_folds.append(
+                {
+                    "fold": float(fold),
+                    "mae": float(mean_absolute_error(y_valid, predicciones)),
+                    "rmse": float(np.sqrt(mean_squared_error(y_valid, predicciones))),
+                    "r2": float(r2_score(y_valid, predicciones)),
+                }
+            )
+
+        resumen_cv[nombre] = {
+            "n_splits": n_splits,
+            "mean_mae": float(np.mean([fold["mae"] for fold in metricas_folds])),
+            "mean_rmse": float(np.mean([fold["rmse"] for fold in metricas_folds])),
+            "mean_r2": float(np.mean([fold["r2"] for fold in metricas_folds])),
+            "folds": metricas_folds,
+        }
+
+    return resumen_cv
 
 
 def seleccionar_mejor_modelo(metricas_por_modelo: dict[str, dict[str, float]]) -> str:
@@ -594,6 +672,7 @@ def ejecutar_pipeline_regresion(
     train_df, test_df = split_temporal(dataset_entrenamiento, train_fraction=train_fraction)
 
     modelos = entrenar_modelos(train_df, test_df)
+    metricas_time_series_cv = evaluar_modelos_time_series_cv(train_df)
     metricas_por_modelo = {
         nombre: resultado.metricas for nombre, resultado in modelos.items()
     }
@@ -617,8 +696,11 @@ def ejecutar_pipeline_regresion(
         "train_rows": int(len(train_df)),
         "test_rows": int(len(test_df)),
         "best_model": mejor_modelo,
+        "features_used": obtener_columnas_features(),
         "models": metricas_por_modelo,
     }
+    if metricas_time_series_cv:
+        metricas["time_series_cv"] = metricas_time_series_cv
 
     guardar_modelo(mejor_pipeline, model_out)
     guardar_metricas(metricas, metrics_out)

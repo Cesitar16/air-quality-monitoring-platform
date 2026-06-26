@@ -1,19 +1,45 @@
 # Docker
 
-## Decision tomada
+## Convencion vigente
 
-El archivo canonico sigue siendo `docker-compose.yml` en la raiz porque ya funciona con la base y la API. Esta carpeta agrega una referencia mas ordenada para futuras extensiones sin romper ese contrato.
+La entrada oficial de contenedores del proyecto es:
 
-## Archivos
+- `docker-compose.yml` en la raiz
 
-- `docker/docker-compose.yml`: compose alternativo con servicio de dashboard
-- `docker/api.Dockerfile`: referencia para construir la API desde contexto raiz
-- `docker/dashboard.Dockerfile`: referencia para construir Streamlit
+La carpeta `docker/` queda reservada unicamente para Dockerfiles reutilizados por ese compose:
 
-## Uso recomendado hoy
+- `docker/api.Dockerfile`
+- `docker/dashboard.Dockerfile`
+
+No se mantiene un `docker-compose` secundario dentro de esta carpeta para evitar duplicar configuracion y generar drift entre ambientes.
+
+## Como se usa hoy
+
+Levantar base de datos y API:
 
 ```powershell
 docker compose up --build
 ```
 
-Si se desea experimentar con la version de esta carpeta, revisar y adaptar rutas antes de usarla en otro entorno.
+Levantar tambien el dashboard opcional:
+
+```powershell
+docker compose --profile dashboard up --build
+```
+
+## Servicios
+
+- `db`: PostgreSQL 16 con schema y seeds del proyecto
+- `api`: FastAPI construida desde `docker/api.Dockerfile`
+- `dashboard`: Streamlit opcional construido desde `docker/dashboard.Dockerfile`
+
+## Nota operativa
+
+El dashboard consume artefactos generados por ETL y modelamiento, por ejemplo:
+
+- `data/processed/dataset_modelado.csv`
+- `data/processed/predicciones_mp25_24h.csv`
+- `models/regression/metricas_regresion.json`
+- `models/regression/modelo_mp25_24h.joblib`
+
+Si esos archivos no estan actualizados, conviene regenerarlos antes de construir la imagen del dashboard.

@@ -162,8 +162,12 @@ def test_preparar_dataset_regresion_construye_target_y_lags_sin_fuga():
     assert preparado.loc[0, "mp25_24h_futuro"] == 50.0
     assert preparado.loc[2, "lag_1"] == 20.0
     assert preparado.loc[2, "lag_2"] == 10.0
+    assert preparado.loc[3, "lag_3"] == 10.0
+    assert preparado.loc[2, "delta_mp25"] == 10.0
     assert preparado.loc[2, "mp25_promedio_movil_3"] == 15.0
-    assert preparado.loc[2, "rolling_mean_4"] == 15.0
+    assert preparado.loc[2, "rolling_mean_6"] == 15.0
+    assert preparado.loc[2, "rolling_mean_12"] == 15.0
+    assert preparado.loc[0, "estacion_del_ano"] == "verano"
     assert preparado.loc[0, "fecha_hora_objetivo"] == pd.Timestamp("2026-01-02 00:00:00")
 
 
@@ -298,4 +302,6 @@ def test_ejecutar_pipeline_regresion_genera_artefactos_y_predicciones(tmp_path):
         predicciones.loc[predicciones["tipo_registro"] == "pronostico_24h", "codigo_estacion"].unique()
     ) == 3
     assert resultado.metricas["best_model"] in {"linear_regression", "random_forest"}
+    assert "time_series_cv" in resultado.metricas
+    assert "estacion_del_ano" in resultado.metricas["features_used"]
     assert not importancia_df.empty

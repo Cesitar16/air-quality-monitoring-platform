@@ -1,112 +1,76 @@
-# 05 - Despliegue con Docker
+# 10 - Despliegue con Docker
 
-## Descripción general
+## Objetivo
 
-Este documento explica cómo se construye y levanta el proyecto usando Docker y Docker Compose.
+Este documento define el contrato Docker vigente del proyecto. La regla actual es simple:
 
-La solución actual utiliza dos servicios:
+- un solo `docker-compose.yml` en la raiz
+- los Dockerfiles viven en `docker/`
+- no se mantiene un compose duplicado dentro de subcarpetas
 
-- `db`: contenedor PostgreSQL 16
-- `api`: contenedor FastAPI con Uvicorn
+## Componentes que se despliegan
 
-La idea es que ambos servicios puedan iniciarse juntos con un solo comando y queden listos para pruebas locales.
+La solucion contenedorizada considera estos servicios:
+
+- `db`: PostgreSQL 16 con schema y seeds del caso
+- `api`: FastAPI + Uvicorn
+- `dashboard`: Streamlit opcional, activado por profile
 
 ## Archivos involucrados
 
-### `docker-compose.yml`
-
-Define los servicios principales del proyecto:
-
-- construcción y ejecución de la API
-- ejecución de PostgreSQL
-- variables de entorno
-- puertos expuestos
-- volumen persistente para la base de datos
-- orden de inicialización mediante `depends_on` y `healthcheck`
-
-### `api/Dockerfile`
-
-Define cómo se construye la imagen de la API.
-
-Pasos principales:
-
-1. Usa `python:3.12-slim` como imagen base.
-2. Define `/app` como directorio de trabajo.
-3. Copia `requirements.txt`.
-4. Instala dependencias con `pip`.
-5. Copia la carpeta `app/`.
-6. Expone el puerto `8000`.
-7. Ejecuta Uvicorn con:
-
-```bash
-uvicorn app.main:app --host 0.0.0.0 --port 8000
-```
+- `docker-compose.yml`: orquestacion oficial
+- `docker/api.Dockerfile`: build de la API desde contexto raiz
+- `docker/dashboard.Dockerfile`: build opcional del dashboard
+- `db/schema.sql`: schema inicial
+- `db/seed_calidad_aire_01_InviernoTemprano.sql`
+- `db/seed_calidad_aire_02_inviernoIIntenso.sql`
+- `db/seed_calidad_aire_03_primavera.sql`
 
 ## Estructura del despliegue
 
 ```text
-Docker Compose
-├── db  -> PostgreSQL 16
-└── api -> FastAPI + Uvicorn
+docker-compose.yml
+        |
+        +-- db        -> PostgreSQL 16
+        +-- api       -> FastAPI
+        +-- dashboard -> Streamlit (profile opcional)
 ```
 
-Relación entre servicios:
+Relacion funcional:
 
 ```text
 PostgreSQL
-    ↓
-FastAPI
-    ↓
-Swagger / Dashboard / ETL / Notebooks
+    ->
+API FastAPI
+    ->
+ETL / notebooks / modelamiento / Swagger
+
+Artefactos locales
+    ->
+Dashboard Streamlit
 ```
 
-## Inicialización de la base de datos
+## Inicializacion de la base
 
-El servicio `db` usa la imagen oficial de PostgreSQL 16.
+En la primera creacion del volumen `postgres_data`, PostgreSQL ejecuta automaticamente los archivos montados en `/docker-entrypoint-initdb.d/`.
 
-Durante la primera creación del volumen, PostgreSQL ejecuta automáticamente los archivos montados en `/docker-entrypoint-initdb.d/`.
-
-En este proyecto se cargan en este orden:
+Orden actual:
 
 1. `db/schema.sql`
 2. `db/seed_calidad_aire_01_InviernoTemprano.sql`
 3. `db/seed_calidad_aire_02_inviernoIIntenso.sql`
 4. `db/seed_calidad_aire_03_primavera.sql`
 
-Eso se define en `docker-compose.yml` con nombres prefijados:
+Si luego cambias schema o seeds, esos cambios no se reaplican mientras el volumen siga existiendo.
 
-```yaml
-- ./db/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
-- ./db/seed_calidad_aire_01_InviernoTemprano.sql:/docker-entrypoint-initdb.d/02_seed_01.sql
-- ./db/seed_calidad_aire_02_inviernoIIntenso.sql:/docker-entrypoint-initdb.d/03_seed_02.sql
-- ./db/seed_calidad_aire_03_primavera.sql:/docker-entrypoint-initdb.d/04_seed_03.sql
-```
+Para reinicializar desde cero:
 
-## Persistencia de datos
-
-La base de datos usa un volumen de Docker:
-
-```yaml
-volumes:
-  postgres_data:
-```
-
-Eso significa que los datos permanecen aunque el contenedor se detenga o se elimine.
-
-Importante:
-
-- si cambias `schema.sql` o alguna seed, PostgreSQL no volverá a ejecutarlos automáticamente mientras el volumen exista
-- para reinicializar desde cero, debes eliminar el volumen
-
-Comando:
-
-```bash
+```powershell
 docker compose down -v
+docker compose up --build
 ```
 
-## Variables de entorno
-
-La API y la base usan estas variables:
+## Variables de entorno principales
 
 ```env
 POSTGRES_DB=calidad_aire_db
@@ -117,196 +81,133 @@ POSTGRES_PORT=5432
 DATABASE_URL=postgresql+psycopg2://postgres:postgres@db:5432/calidad_aire_db
 ```
 
-La API usa `POSTGRES_HOST=db` porque dentro de Docker Compose el contenedor PostgreSQL se resuelve por el nombre del servicio.
+Dentro de Compose, la API resuelve la base con `POSTGRES_HOST=db` porque `db` es el nombre del servicio.
 
 ## Puertos expuestos
 
-### Base de datos
+- Base de datos: `localhost:5432`
+- API: `http://localhost:8000`
+- Swagger: `http://localhost:8000/docs`
+- Dashboard opcional: `http://localhost:8501`
 
-```text
-localhost:5432
-```
+## Comandos oficiales
 
-### API
-
-```text
-http://localhost:8000
-```
-
-### Swagger
-
-```text
-http://localhost:8000/docs
-```
-
-## Cómo construir y levantar el proyecto
-
-### 1. Crear `.env`
-
-Si todavía no existe:
-
-```bash
-cp .env.example .env
-```
-
-En PowerShell:
+Levantar base de datos y API:
 
 ```powershell
-Copy-Item .env.example .env
-```
-
-### 2. Construir y levantar todo
-
-```bash
 docker compose up --build
 ```
 
-Esto hace lo siguiente:
+Levantar tambien el dashboard:
 
-- construye la imagen de la API usando `api/Dockerfile`
-- levanta PostgreSQL
-- espera a que PostgreSQL esté saludable
-- levanta la API
+```powershell
+docker compose --profile dashboard up --build
+```
 
-### 3. Levantar en segundo plano
+Levantar en segundo plano:
 
-```bash
+```powershell
 docker compose up --build -d
+docker compose --profile dashboard up --build -d
 ```
 
-## Cómo levantar solo la base de datos
+Reconstruir solo la API:
 
-```bash
-docker compose up db
-```
-
-O en segundo plano:
-
-```bash
-docker compose up -d db
-```
-
-## Cómo reconstruir solo la API
-
-Si cambias código Python o dependencias:
-
-```bash
+```powershell
 docker compose up --build api
 ```
 
-## Cómo ver logs
+Levantar solo la base:
 
-### Logs de toda la solución
+```powershell
+docker compose up -d db
+```
 
-```bash
+## Logs y diagnostico
+
+Logs de toda la solucion:
+
+```powershell
 docker compose logs
 ```
 
-### Logs de la API
+Logs por servicio:
 
-```bash
+```powershell
 docker compose logs api
-```
-
-### Logs de PostgreSQL
-
-```bash
 docker compose logs db
+docker compose logs dashboard
 ```
 
-### Seguir logs en tiempo real
+Seguimiento en tiempo real:
 
-```bash
+```powershell
 docker compose logs -f api
 docker compose logs -f db
 ```
 
-## Cómo detener los servicios
+## Detencion
 
-```bash
+```powershell
 docker compose down
 ```
 
-Si además quieres borrar el volumen de PostgreSQL:
+Con borrado de volumen:
 
-```bash
+```powershell
 docker compose down -v
 ```
 
-## Validación esperada después del despliegue
+## Validacion esperada
 
-Si todo levantó correctamente, deberías poder comprobar lo siguiente:
+Una vez levantados `db` y `api`, deberias poder validar:
 
-### Healthcheck API
-
-```bash
+```powershell
 curl http://localhost:8000/health
 ```
 
-Respuesta esperada:
+Y abrir:
 
-```json
-{
-  "status": "ok",
-  "service": "air-quality-api",
-  "database": "connected"
-}
-```
+- `http://localhost:8000/docs`
 
-### Swagger
+Si activaste el profile del dashboard:
 
-Abrir:
+- `http://localhost:8501`
 
-```text
-http://localhost:8000/docs
-```
+## Consideraciones del dashboard
+
+El dashboard no recalcula ETL ni modelos al iniciar. Solo lee artefactos ya generados, por ejemplo:
+
+- `data/processed/dataset_modelado.csv`
+- `data/processed/predicciones_mp25_24h.csv`
+- `models/regression/metricas_regresion.json`
+- `models/regression/modelo_mp25_24h.joblib`
+
+Por eso, antes de construir la imagen del dashboard, conviene haber ejecutado ETL, clustering y regresion al menos una vez.
 
 ## Problemas comunes
 
-### Puerto 5432 ocupado
+### El puerto 5432 esta ocupado
 
-Si PostgreSQL local ya está usando el puerto `5432`, Docker puede fallar al levantar `db`.
+Cierra PostgreSQL local o cambia el mapeo del servicio `db`.
 
-Opciones:
+### El puerto 8000 esta ocupado
 
-- detener el PostgreSQL local
-- cambiar el mapeo de puerto en `docker-compose.yml`
+Cierra el proceso que lo usa o cambia el puerto expuesto de `api`.
 
-### Puerto 8000 ocupado
+### El dashboard abre pero no muestra datos actualizados
 
-Si otra app usa el puerto `8000`, la API no podrá exponerse.
+Normalmente significa que los artefactos de `data/processed/` o `models/` no fueron regenerados antes del build.
 
-Opciones:
+### Cambie una seed y no veo cambios
 
-- detener el proceso que ocupa ese puerto
-- cambiar el mapeo en `docker-compose.yml`
-
-### Cambié el schema o seeds y no veo cambios
-
-Eso normalmente ocurre porque el volumen `postgres_data` sigue existiendo.
-
-Solución:
-
-```bash
-docker compose down -v
-docker compose up --build
-```
-
-### La API no inicia porque la base no está lista
-
-El `docker-compose.yml` ya incluye:
-
-- `healthcheck` en PostgreSQL
-- `depends_on` con condición `service_healthy`
-
-Eso ayuda a que la API espere a la base antes de iniciar.
+Eso ocurre porque el volumen `postgres_data` conserva el estado previo. Reinicializa con `docker compose down -v`.
 
 ## Resumen
 
-El despliegue del proyecto está pensado para ser simple:
+La convencion final queda asi:
 
-- PostgreSQL se inicializa con `schema.sql` y las seeds
-- FastAPI se construye desde `api/Dockerfile`
-- Docker Compose coordina ambos servicios
-- la API queda expuesta en `localhost:8000`
-- Swagger queda disponible en `localhost:8000/docs`
+- Compose oficial: `docker-compose.yml` en raiz
+- Dockerfiles oficiales: `docker/`
+- Base y API: flujo principal contenedorizado
+- Dashboard: servicio opcional por profile, sin duplicar compose

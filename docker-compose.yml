@@ -22,7 +22,8 @@ services:
 
   api:
     build:
-      context: ./api
+      context: .
+      dockerfile: docker/api.Dockerfile
     container_name: calidad_aire_api
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-calidad_aire_db}
@@ -36,6 +37,18 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  dashboard:
+    profiles: ["dashboard"]
+    build:
+      context: .
+      dockerfile: docker/dashboard.Dockerfile
+    container_name: calidad_aire_dashboard
+    ports:
+      - "8501:8501"
+    depends_on:
+      api:
+        condition: service_started
 
 volumes:
   postgres_data:
