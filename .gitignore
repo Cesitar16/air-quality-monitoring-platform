@@ -5,3 +5,7 @@ __pycache__/
 .venv/
 venv/
 .env
+
+.ipynb_checkpoints/
+.venv-*/
+data/processed/dataset_clusterizado.csv
