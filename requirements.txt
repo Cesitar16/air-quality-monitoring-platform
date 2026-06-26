@@ -1,4 +1,4 @@
-﻿pandas
+pandas
 numpy
 matplotlib
 scikit-learn
@@ -6,3 +6,7 @@ requests
 jupyter
 openpyxl
 pytest
+joblib
+streamlit
+plotly
+nbformat

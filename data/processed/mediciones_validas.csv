@@ -1,53 +1,53 @@
 fecha_hora,codigo_estacion,comuna,region,mp25,mp10,so2,no2,velocidad_viento,direccion_viento_grados,temperatura,humedad,fuente_dato
-2026-06-01 00:00:00,OF-RAN-001,Rancagua,O'Higgins,52.4,88.1,17.3,31.0,1.2,180.0,6.1,88.0,oficial
-2026-06-01 06:00:00,OF-RAN-001,Rancagua,O'Higgins,49.8,84.4,16.8,29.6,1.5,195.0,5.2,91.0,oficial
-2026-06-01 12:00:00,OF-RAN-001,Rancagua,O'Higgins,28.5,54.2,14.1,24.7,4.6,220.0,13.4,61.0,oficial
-2026-06-01 18:00:00,OF-RAN-001,Rancagua,O'Higgins,45.2,76.3,15.9,28.3,2.8,205.0,9.3,74.0,oficial
-2026-06-02 00:00:00,OF-TAL-001,Talca,Maule,61.7,97.5,13.6,27.4,1.0,170.0,4.8,92.0,oficial
-2026-06-02 06:00:00,OF-TAL-001,Talca,Maule,57.9,92.8,13.2,26.8,1.4,188.0,3.9,95.0,oficial
-2026-06-02 12:00:00,OF-TAL-001,Talca,Maule,34.1,60.7,11.5,22.1,5.1,230.0,12.6,63.0,oficial
-2026-06-02 18:00:00,OF-TAL-001,Talca,Maule,53.0,85.1,12.7,25.5,2.6,214.0,8.7,76.0,oficial
-2026-06-03 00:00:00,OF-CUR-001,Curicó,Maule,58.2,91.2,12.0,24.8,1.3,160.0,5.5,87.0,oficial
-2026-06-03 06:00:00,OF-CUR-001,Curicó,Maule,55.4,87.0,11.8,24.1,1.6,176.0,4.6,90.0,oficial
-2026-06-03 12:00:00,OF-CUR-001,Curicó,Maule,31.8,58.8,10.7,21.5,4.9,222.0,13.1,60.0,oficial
-2026-06-03 18:00:00,OF-CUR-001,Curicó,Maule,51.1,82.6,11.3,23.4,2.7,208.0,8.9,73.0,oficial
-2026-06-04 00:00:00,OF-CHI-001,Chillán,Ñuble,74.5,118.7,15.2,26.9,0.8,145.0,3.5,94.0,oficial
-2026-06-04 06:00:00,OF-CHI-001,Chillán,Ñuble,69.8,111.3,14.9,26.1,1.1,158.0,2.9,96.0,oficial
-2026-06-04 12:00:00,OF-CHI-001,Chillán,Ñuble,42.2,70.5,12.8,22.0,4.3,210.0,11.5,66.0,oficial
-2026-06-04 18:00:00,OF-CHI-001,Chillán,Ñuble,64.1,103.4,13.7,24.4,2.4,198.0,7.4,79.0,oficial
-2026-06-05 00:00:00,OF-SCA-001,San Carlos,Ñuble,68.0,109.8,13.1,23.9,0.9,150.0,3.8,93.0,oficial
-2026-06-05 06:00:00,OF-SCA-001,San Carlos,Ñuble,65.4,104.1,12.9,23.1,1.2,164.0,3.1,95.0,oficial
-2026-06-05 12:00:00,OF-SCA-001,San Carlos,Ñuble,39.7,67.4,11.2,20.8,4.1,216.0,12.0,64.0,oficial
-2026-06-05 18:00:00,OF-SCA-001,San Carlos,Ñuble,59.5,96.9,12.1,22.6,2.3,202.0,7.8,78.0,oficial
-2026-09-10 00:00:00,OF-CON-001,Concepción,Biobío,44.3,79.5,34.8,48.7,1.7,95.0,8.1,86.0,oficial
-2026-09-10 06:00:00,OF-CON-001,Concepción,Biobío,41.5,75.2,33.9,46.4,2.0,110.0,7.4,88.0,oficial
-2026-09-10 12:00:00,OF-CON-001,Concepción,Biobío,24.8,50.1,29.4,39.8,6.4,140.0,16.5,58.0,oficial
-2026-09-10 18:00:00,OF-CON-001,Concepción,Biobío,38.6,69.7,31.1,44.5,4.7,126.0,12.9,69.0,oficial
-2026-09-11 00:00:00,OF-COR-001,Coronel,Biobío,55.0,101.8,47.9,59.0,1.9,102.0,7.9,87.0,oficial
-2026-09-11 06:00:00,OF-COR-001,Coronel,Biobío,51.7,96.5,45.6,57.1,2.2,118.0,7.0,90.0,oficial
-2026-09-11 12:00:00,OF-COR-001,Coronel,Biobío,29.9,61.0,39.5,49.2,6.8,148.0,15.8,60.0,oficial
-2026-09-11 18:00:00,OF-COR-001,Coronel,Biobío,49.2,90.8,43.8,55.4,4.9,132.0,12.1,71.0,oficial
-2026-09-12 00:00:00,OF-HUA-001,Hualpén,Biobío,57.3,108.4,310.0,63.2,2.1,108.0,8.3,85.0,oficial
-2026-06-03 00:00:00,ONG-RAN-001,Rancagua,O'Higgins,49.0,82.0,15.0,28.0,,,,,comunitaria
+2026-01-06 00:00:00,OF-RAN-001,Rancagua,O'Higgins,52.4,88.1,17.3,31.0,1.2,180.0,6.1,88.0,oficial
+2026-01-06 06:00:00,OF-RAN-001,Rancagua,O'Higgins,49.8,84.4,16.8,29.6,1.5,195.0,5.2,91.0,oficial
+2026-01-06 12:00:00,OF-RAN-001,Rancagua,O'Higgins,28.5,54.2,14.1,24.7,4.6,220.0,13.4,61.0,oficial
+2026-01-06 18:00:00,OF-RAN-001,Rancagua,O'Higgins,45.2,76.3,15.9,28.3,2.8,205.0,9.3,74.0,oficial
+2026-02-06 00:00:00,OF-TAL-001,Talca,Maule,61.7,97.5,13.6,27.4,1.0,170.0,4.8,92.0,oficial
+2026-02-06 06:00:00,OF-TAL-001,Talca,Maule,57.9,92.8,13.2,26.8,1.4,188.0,3.9,95.0,oficial
+2026-02-06 12:00:00,OF-TAL-001,Talca,Maule,34.1,60.7,11.5,22.1,5.1,230.0,12.6,63.0,oficial
+2026-02-06 18:00:00,OF-TAL-001,Talca,Maule,53.0,85.1,12.7,25.5,2.6,214.0,8.7,76.0,oficial
+2026-03-06 00:00:00,OF-CUR-001,Curicó,Maule,58.2,91.2,12.0,24.8,1.3,160.0,5.5,87.0,oficial
+2026-03-06 06:00:00,OF-CUR-001,Curicó,Maule,55.4,87.0,11.8,24.1,1.6,176.0,4.6,90.0,oficial
+2026-03-06 12:00:00,OF-CUR-001,Curicó,Maule,31.8,58.8,10.7,21.5,4.9,222.0,13.1,60.0,oficial
+2026-03-06 18:00:00,OF-CUR-001,Curicó,Maule,51.1,82.6,11.3,23.4,2.7,208.0,8.9,73.0,oficial
+2026-04-06 00:00:00,OF-CHI-001,Chillán,Ñuble,74.5,118.7,15.2,26.9,0.8,145.0,3.5,94.0,oficial
+2026-04-06 06:00:00,OF-CHI-001,Chillán,Ñuble,69.8,111.3,14.9,26.1,1.1,158.0,2.9,96.0,oficial
+2026-04-06 12:00:00,OF-CHI-001,Chillán,Ñuble,42.2,70.5,12.8,22.0,4.3,210.0,11.5,66.0,oficial
+2026-04-06 18:00:00,OF-CHI-001,Chillán,Ñuble,64.1,103.4,13.7,24.4,2.4,198.0,7.4,79.0,oficial
+2026-05-06 00:00:00,OF-SCA-001,San Carlos,Ñuble,68.0,109.8,13.1,23.9,0.9,150.0,3.8,93.0,oficial
+2026-05-06 06:00:00,OF-SCA-001,San Carlos,Ñuble,65.4,104.1,12.9,23.1,1.2,164.0,3.1,95.0,oficial
+2026-05-06 12:00:00,OF-SCA-001,San Carlos,Ñuble,39.7,67.4,11.2,20.8,4.1,216.0,12.0,64.0,oficial
+2026-05-06 18:00:00,OF-SCA-001,San Carlos,Ñuble,59.5,96.9,12.1,22.6,2.3,202.0,7.8,78.0,oficial
+2026-10-09 00:00:00,OF-CON-001,Concepción,Biobío,44.3,79.5,34.8,48.7,1.7,95.0,8.1,86.0,oficial
+2026-10-09 06:00:00,OF-CON-001,Concepción,Biobío,41.5,75.2,33.9,46.4,2.0,110.0,7.4,88.0,oficial
+2026-10-09 12:00:00,OF-CON-001,Concepción,Biobío,24.8,50.1,29.4,39.8,6.4,140.0,16.5,58.0,oficial
+2026-10-09 18:00:00,OF-CON-001,Concepción,Biobío,38.6,69.7,31.1,44.5,4.7,126.0,12.9,69.0,oficial
+2026-11-09 00:00:00,OF-COR-001,Coronel,Biobío,55.0,101.8,47.9,59.0,1.9,102.0,7.9,87.0,oficial
+2026-11-09 06:00:00,OF-COR-001,Coronel,Biobío,51.7,96.5,45.6,57.1,2.2,118.0,7.0,90.0,oficial
+2026-11-09 12:00:00,OF-COR-001,Coronel,Biobío,29.9,61.0,39.5,49.2,6.8,148.0,15.8,60.0,oficial
+2026-11-09 18:00:00,OF-COR-001,Coronel,Biobío,49.2,90.8,43.8,55.4,4.9,132.0,12.1,71.0,oficial
+2026-12-09 00:00:00,OF-HUA-001,Hualpén,Biobío,57.3,108.4,310.0,63.2,2.1,108.0,8.3,85.0,oficial
+2026-03-06 00:00:00,ONG-RAN-001,Rancagua,O'Higgins,49.0,82.0,15.0,28.0,,,,,comunitaria
 2026-06-03 06:00:00,ONG-RAN-001,Rancagua,O'Higgins,46.7,79.4,14.4,27.1,,,,,comunitaria
-2026-06-03 12:00:00,ONG-RAN-001,Rancagua,O'Higgins,27.2,50.5,12.8,22.8,,,,,comunitaria
-2026-06-03 18:00:00,ONG-RAN-001,Rancagua,O'Higgins,42.9,71.8,13.6,25.2,,,,,comunitaria
-2026-06-04 00:00:00,ONG-TAL-001,Talca,Maule,58.4,93.1,12.5,25.0,,,,,comunitaria
+2026-03-06 12:00:00,ONG-RAN-001,Rancagua,O'Higgins,27.2,50.5,12.8,22.8,,,,,comunitaria
+2026-03-06 18:00:00,ONG-RAN-001,Rancagua,O'Higgins,42.9,71.8,13.6,25.2,,,,,comunitaria
+2026-04-06 00:00:00,ONG-TAL-001,Talca,Maule,58.4,93.1,12.5,25.0,,,,,comunitaria
 2026-06-04 06:00:00,ONG-TAL-001,Talca,Maule,55.7,88.9,12.1,24.4,,,,,comunitaria
-2026-06-04 12:00:00,ONG-TAL-001,Talca,Maule,33.5,59.4,10.7,21.3,,,,,comunitaria
-2026-06-04 18:00:00,ONG-TAL-001,Talca,Maule,51.6,83.2,11.6,23.7,,,,,comunitaria
-2026-06-05 00:00:00,ONG-CUR-001,Curicó,Maule,54.1,86.4,11.1,22.7,,,,,comunitaria
+2026-04-06 12:00:00,ONG-TAL-001,Talca,Maule,33.5,59.4,10.7,21.3,,,,,comunitaria
+2026-04-06 18:00:00,ONG-TAL-001,Talca,Maule,51.6,83.2,11.6,23.7,,,,,comunitaria
+2026-05-06 00:00:00,ONG-CUR-001,Curicó,Maule,54.1,86.4,11.1,22.7,,,,,comunitaria
 2026-06-05 06:00:00,ONG-CUR-001,Curicó,Maule,52.0,83.8,10.9,22.1,,,,,comunitaria
-2026-06-05 12:00:00,ONG-CUR-001,Curicó,Maule,31.4,56.7,9.8,20.4,,,,,comunitaria
-2026-06-05 18:00:00,ONG-CUR-001,Curicó,Maule,47.8,77.3,10.4,21.9,,,,,comunitaria
+2026-05-06 12:00:00,ONG-CUR-001,Curicó,Maule,31.4,56.7,9.8,20.4,,,,,comunitaria
+2026-05-06 18:00:00,ONG-CUR-001,Curicó,Maule,47.8,77.3,10.4,21.9,,,,,comunitaria
 2026-06-06 00:00:00,ONG-CHI-001,Chillán,Ñuble,71.2,114.1,13.5,25.1,,,,,comunitaria
 2026-06-06 06:00:00,ONG-CHI-001,Chillán,Ñuble,67.9,108.2,13.1,24.6,,,,,comunitaria
 2026-06-06 12:00:00,ONG-CHI-001,Chillán,Ñuble,40.1,68.5,11.3,21.4,,,,,comunitaria
 2026-06-06 18:00:00,ONG-CHI-001,Chillán,Ñuble,62.4,100.0,12.3,23.0,,,,,comunitaria
-2026-06-07 00:00:00,ONG-SCA-001,San Carlos,Ñuble,64.5,103.0,12.2,22.8,,,,,comunitaria
+2026-07-06 00:00:00,ONG-SCA-001,San Carlos,Ñuble,64.5,103.0,12.2,22.8,,,,,comunitaria
 2026-06-07 06:00:00,ONG-SCA-001,San Carlos,Ñuble,61.0,97.6,11.8,22.0,,,,,comunitaria
-2026-06-07 12:00:00,ONG-SCA-001,San Carlos,Ñuble,37.5,64.0,10.4,19.8,,,,,comunitaria
-2026-06-07 18:00:00,ONG-SCA-001,San Carlos,Ñuble,58.3,93.4,11.0,21.7,,,,,comunitaria
+2026-07-06 12:00:00,ONG-SCA-001,San Carlos,Ñuble,37.5,64.0,10.4,19.8,,,,,comunitaria
+2026-07-06 18:00:00,ONG-SCA-001,San Carlos,Ñuble,58.3,93.4,11.0,21.7,,,,,comunitaria
 2026-09-13 00:00:00,ONG-CON-001,Concepción,Biobío,39.8,72.4,31.5,45.1,,,,,comunitaria
 2026-09-13 06:00:00,ONG-CON-001,Concepción,Biobío,37.4,69.3,30.8,43.6,,,,,comunitaria
 2026-09-13 12:00:00,ONG-CON-001,Concepción,Biobío,22.6,47.2,27.3,37.4,,,,,comunitaria

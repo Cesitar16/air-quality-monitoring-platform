@@ -1,2 +1,2 @@
 modo,total_preparadas,total_con_id_estacion,omitidas_por_estacion_no_encontrada,omitidas_por_estacion_ambigua,omitidas_por_codigo_api_no_disponible,omitidas_por_clima_requerido_api,omitidas_por_medicion_ya_existente,insertados,errores,mensaje,modo_mapeo,detalle_errores
-api,0,60,0,0,0,31,29,0,0,No hay mediciones nuevas compatibles para enviar a la API.,exacto_api>mapeo_manual_csv>heuristico_seguro,[]
+dry-run,0,0,60,0,0,0,0,0,0,No hay mediciones nuevas compatibles para enviar a la API.,exacto_api>mapeo_manual_csv>heuristico_seguro,[]

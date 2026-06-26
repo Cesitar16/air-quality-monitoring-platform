@@ -1,61 +1,61 @@
 codigo_estacion,codigo_unico_api,id_estacion,comuna,region,fuente_dato,fecha_hora,motivo_omision,modo_mapeo
-ONG-RAN-001,SEN-RAN-ONG-001,2,Rancagua,O'Higgins,comunitaria,2026-06-03 00:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-RAN-001,SEN-RAN-ONG-001,2,Rancagua,O'Higgins,comunitaria,2026-06-03 06:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-RAN-001,SEN-RAN-ONG-001,2,Rancagua,O'Higgins,comunitaria,2026-06-03 12:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-RAN-001,SEN-RAN-ONG-001,2,Rancagua,O'Higgins,comunitaria,2026-06-03 18:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-TAL-001,SEN-TAL-ONG-001,27,Talca,Maule,comunitaria,2026-06-04 00:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-TAL-001,SEN-TAL-ONG-001,27,Talca,Maule,comunitaria,2026-06-04 06:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-TAL-001,SEN-TAL-ONG-001,27,Talca,Maule,comunitaria,2026-06-04 12:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-TAL-001,SEN-TAL-ONG-001,27,Talca,Maule,comunitaria,2026-06-04 18:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-CUR-001,SEN-CUR-ONG-001,5,Curicó,Maule,comunitaria,2026-06-05 00:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-CUR-001,SEN-CUR-ONG-001,5,Curicó,Maule,comunitaria,2026-06-05 06:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-CUR-001,SEN-CUR-ONG-001,5,Curicó,Maule,comunitaria,2026-06-05 12:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-CUR-001,SEN-CUR-ONG-001,5,Curicó,Maule,comunitaria,2026-06-05 18:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-CHI-001,SEN-CHI-ONG-001,7,Chillán,Ñuble,comunitaria,2026-06-06 00:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-CHI-001,SEN-CHI-ONG-001,7,Chillán,Ñuble,comunitaria,2026-06-06 06:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-CHI-001,SEN-CHI-ONG-001,7,Chillán,Ñuble,comunitaria,2026-06-06 12:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-CHI-001,SEN-CHI-ONG-001,7,Chillán,Ñuble,comunitaria,2026-06-06 18:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-SCA-001,SEN-SCA-ONG-001,8,San Carlos,Ñuble,comunitaria,2026-06-07 00:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-SCA-001,SEN-SCA-ONG-001,8,San Carlos,Ñuble,comunitaria,2026-06-07 06:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-SCA-001,SEN-SCA-ONG-001,8,San Carlos,Ñuble,comunitaria,2026-06-07 12:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-SCA-001,SEN-SCA-ONG-001,8,San Carlos,Ñuble,comunitaria,2026-06-07 18:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-CON-001,SEN-CON-ONG-001,31,Concepción,Biobío,comunitaria,2026-09-13 00:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-CON-001,SEN-CON-ONG-001,31,Concepción,Biobío,comunitaria,2026-09-13 06:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-CON-001,SEN-CON-ONG-001,31,Concepción,Biobío,comunitaria,2026-09-13 12:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-CON-001,SEN-CON-ONG-001,31,Concepción,Biobío,comunitaria,2026-09-13 18:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-COR-001,SEN-COR-ONG-001,11,Coronel,Biobío,comunitaria,2026-09-14 00:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-COR-001,SEN-COR-ONG-001,11,Coronel,Biobío,comunitaria,2026-09-14 06:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-COR-001,SEN-COR-ONG-001,11,Coronel,Biobío,comunitaria,2026-09-14 12:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-COR-001,SEN-COR-ONG-001,11,Coronel,Biobío,comunitaria,2026-09-14 18:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-HUA-001,SEN-HUA-ONG-001,32,Hualpén,Biobío,comunitaria,2026-09-15 00:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-HUA-001,SEN-HUA-ONG-001,32,Hualpén,Biobío,comunitaria,2026-09-15 06:00:00,clima_requerido_por_api,mapeo_manual_csv
-ONG-HUA-001,SEN-HUA-ONG-001,32,Hualpén,Biobío,comunitaria,2026-09-15 18:00:00,clima_requerido_por_api,mapeo_manual_csv
-OF-RAN-001,SEN-RAN-OF-001,1,Rancagua,O'Higgins,oficial,2026-06-01T00:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-RAN-001,SEN-RAN-OF-001,1,Rancagua,O'Higgins,oficial,2026-06-01T06:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-RAN-001,SEN-RAN-OF-001,1,Rancagua,O'Higgins,oficial,2026-06-01T12:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-RAN-001,SEN-RAN-OF-001,1,Rancagua,O'Higgins,oficial,2026-06-01T18:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-TAL-001,SEN-TAL-OF-001,4,Talca,Maule,oficial,2026-06-02T00:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-TAL-001,SEN-TAL-OF-001,4,Talca,Maule,oficial,2026-06-02T06:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-TAL-001,SEN-TAL-OF-001,4,Talca,Maule,oficial,2026-06-02T12:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-TAL-001,SEN-TAL-OF-001,4,Talca,Maule,oficial,2026-06-02T18:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-CUR-001,SEN-CUR-OF-001,28,Curicó,Maule,oficial,2026-06-03T00:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-CUR-001,SEN-CUR-OF-001,28,Curicó,Maule,oficial,2026-06-03T06:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-CUR-001,SEN-CUR-OF-001,28,Curicó,Maule,oficial,2026-06-03T12:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-CUR-001,SEN-CUR-OF-001,28,Curicó,Maule,oficial,2026-06-03T18:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-CHI-001,SEN-CHI-OF-001,6,Chillán,Ñuble,oficial,2026-06-04T00:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-CHI-001,SEN-CHI-OF-001,6,Chillán,Ñuble,oficial,2026-06-04T06:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-CHI-001,SEN-CHI-OF-001,6,Chillán,Ñuble,oficial,2026-06-04T12:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-CHI-001,SEN-CHI-OF-001,6,Chillán,Ñuble,oficial,2026-06-04T18:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-SCA-001,SEN-SCA-OF-001,30,San Carlos,Ñuble,oficial,2026-06-05T00:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-SCA-001,SEN-SCA-OF-001,30,San Carlos,Ñuble,oficial,2026-06-05T06:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-SCA-001,SEN-SCA-OF-001,30,San Carlos,Ñuble,oficial,2026-06-05T12:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-SCA-001,SEN-SCA-OF-001,30,San Carlos,Ñuble,oficial,2026-06-05T18:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-CON-001,SEN-CON-OF-001,9,Concepción,Biobío,oficial,2026-09-10T00:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-CON-001,SEN-CON-OF-001,9,Concepción,Biobío,oficial,2026-09-10T06:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-CON-001,SEN-CON-OF-001,9,Concepción,Biobío,oficial,2026-09-10T12:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-CON-001,SEN-CON-OF-001,9,Concepción,Biobío,oficial,2026-09-10T18:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-COR-001,SEN-COR-OF-001,33,Coronel,Biobío,oficial,2026-09-11T00:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-COR-001,SEN-COR-OF-001,33,Coronel,Biobío,oficial,2026-09-11T06:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-COR-001,SEN-COR-OF-001,33,Coronel,Biobío,oficial,2026-09-11T12:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-COR-001,SEN-COR-OF-001,33,Coronel,Biobío,oficial,2026-09-11T18:00:00,medicion_ya_existente,mapeo_manual_csv
-OF-HUA-001,SEN-HUA-OF-001,10,Hualpén,Biobío,oficial,2026-09-12T00:00:00,medicion_ya_existente,mapeo_manual_csv
+OF-RAN-001,,,Rancagua,O'Higgins,oficial,2026-01-06 00:00:00,estacion_no_encontrada,heuristico_seguro
+OF-RAN-001,,,Rancagua,O'Higgins,oficial,2026-01-06 06:00:00,estacion_no_encontrada,heuristico_seguro
+OF-RAN-001,,,Rancagua,O'Higgins,oficial,2026-01-06 12:00:00,estacion_no_encontrada,heuristico_seguro
+OF-RAN-001,,,Rancagua,O'Higgins,oficial,2026-01-06 18:00:00,estacion_no_encontrada,heuristico_seguro
+OF-TAL-001,,,Talca,Maule,oficial,2026-02-06 00:00:00,estacion_no_encontrada,heuristico_seguro
+OF-TAL-001,,,Talca,Maule,oficial,2026-02-06 06:00:00,estacion_no_encontrada,heuristico_seguro
+OF-TAL-001,,,Talca,Maule,oficial,2026-02-06 12:00:00,estacion_no_encontrada,heuristico_seguro
+OF-TAL-001,,,Talca,Maule,oficial,2026-02-06 18:00:00,estacion_no_encontrada,heuristico_seguro
+OF-CUR-001,,,Curicó,Maule,oficial,2026-03-06 00:00:00,estacion_no_encontrada,heuristico_seguro
+OF-CUR-001,,,Curicó,Maule,oficial,2026-03-06 06:00:00,estacion_no_encontrada,heuristico_seguro
+OF-CUR-001,,,Curicó,Maule,oficial,2026-03-06 12:00:00,estacion_no_encontrada,heuristico_seguro
+OF-CUR-001,,,Curicó,Maule,oficial,2026-03-06 18:00:00,estacion_no_encontrada,heuristico_seguro
+OF-CHI-001,,,Chillán,Ñuble,oficial,2026-04-06 00:00:00,estacion_no_encontrada,heuristico_seguro
+OF-CHI-001,,,Chillán,Ñuble,oficial,2026-04-06 06:00:00,estacion_no_encontrada,heuristico_seguro
+OF-CHI-001,,,Chillán,Ñuble,oficial,2026-04-06 12:00:00,estacion_no_encontrada,heuristico_seguro
+OF-CHI-001,,,Chillán,Ñuble,oficial,2026-04-06 18:00:00,estacion_no_encontrada,heuristico_seguro
+OF-SCA-001,,,San Carlos,Ñuble,oficial,2026-05-06 00:00:00,estacion_no_encontrada,heuristico_seguro
+OF-SCA-001,,,San Carlos,Ñuble,oficial,2026-05-06 06:00:00,estacion_no_encontrada,heuristico_seguro
+OF-SCA-001,,,San Carlos,Ñuble,oficial,2026-05-06 12:00:00,estacion_no_encontrada,heuristico_seguro
+OF-SCA-001,,,San Carlos,Ñuble,oficial,2026-05-06 18:00:00,estacion_no_encontrada,heuristico_seguro
+OF-CON-001,,,Concepción,Biobío,oficial,2026-10-09 00:00:00,estacion_no_encontrada,heuristico_seguro
+OF-CON-001,,,Concepción,Biobío,oficial,2026-10-09 06:00:00,estacion_no_encontrada,heuristico_seguro
+OF-CON-001,,,Concepción,Biobío,oficial,2026-10-09 12:00:00,estacion_no_encontrada,heuristico_seguro
+OF-CON-001,,,Concepción,Biobío,oficial,2026-10-09 18:00:00,estacion_no_encontrada,heuristico_seguro
+OF-COR-001,,,Coronel,Biobío,oficial,2026-11-09 00:00:00,estacion_no_encontrada,heuristico_seguro
+OF-COR-001,,,Coronel,Biobío,oficial,2026-11-09 06:00:00,estacion_no_encontrada,heuristico_seguro
+OF-COR-001,,,Coronel,Biobío,oficial,2026-11-09 12:00:00,estacion_no_encontrada,heuristico_seguro
+OF-COR-001,,,Coronel,Biobío,oficial,2026-11-09 18:00:00,estacion_no_encontrada,heuristico_seguro
+OF-HUA-001,,,Hualpén,Biobío,oficial,2026-12-09 00:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-RAN-001,,,Rancagua,O'Higgins,comunitaria,2026-03-06 00:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-RAN-001,,,Rancagua,O'Higgins,comunitaria,2026-06-03 06:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-RAN-001,,,Rancagua,O'Higgins,comunitaria,2026-03-06 12:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-RAN-001,,,Rancagua,O'Higgins,comunitaria,2026-03-06 18:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-TAL-001,,,Talca,Maule,comunitaria,2026-04-06 00:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-TAL-001,,,Talca,Maule,comunitaria,2026-06-04 06:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-TAL-001,,,Talca,Maule,comunitaria,2026-04-06 12:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-TAL-001,,,Talca,Maule,comunitaria,2026-04-06 18:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-CUR-001,,,Curicó,Maule,comunitaria,2026-05-06 00:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-CUR-001,,,Curicó,Maule,comunitaria,2026-06-05 06:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-CUR-001,,,Curicó,Maule,comunitaria,2026-05-06 12:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-CUR-001,,,Curicó,Maule,comunitaria,2026-05-06 18:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-CHI-001,,,Chillán,Ñuble,comunitaria,2026-06-06 00:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-CHI-001,,,Chillán,Ñuble,comunitaria,2026-06-06 06:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-CHI-001,,,Chillán,Ñuble,comunitaria,2026-06-06 12:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-CHI-001,,,Chillán,Ñuble,comunitaria,2026-06-06 18:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-SCA-001,,,San Carlos,Ñuble,comunitaria,2026-07-06 00:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-SCA-001,,,San Carlos,Ñuble,comunitaria,2026-06-07 06:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-SCA-001,,,San Carlos,Ñuble,comunitaria,2026-07-06 12:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-SCA-001,,,San Carlos,Ñuble,comunitaria,2026-07-06 18:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-CON-001,,,Concepción,Biobío,comunitaria,2026-09-13 00:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-CON-001,,,Concepción,Biobío,comunitaria,2026-09-13 06:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-CON-001,,,Concepción,Biobío,comunitaria,2026-09-13 12:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-CON-001,,,Concepción,Biobío,comunitaria,2026-09-13 18:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-COR-001,,,Coronel,Biobío,comunitaria,2026-09-14 00:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-COR-001,,,Coronel,Biobío,comunitaria,2026-09-14 06:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-COR-001,,,Coronel,Biobío,comunitaria,2026-09-14 12:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-COR-001,,,Coronel,Biobío,comunitaria,2026-09-14 18:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-HUA-001,,,Hualpén,Biobío,comunitaria,2026-09-15 00:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-HUA-001,,,Hualpén,Biobío,comunitaria,2026-09-15 06:00:00,estacion_no_encontrada,heuristico_seguro
+ONG-HUA-001,,,Hualpén,Biobío,comunitaria,2026-09-15 18:00:00,estacion_no_encontrada,heuristico_seguro
