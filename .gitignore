@@ -9,3 +9,7 @@ venv/
 .ipynb_checkpoints/
 .venv-*/
 data/processed/dataset_clusterizado.csv
+logs/
+tests_bootstrap.sqlite3
+models/clustering/*.joblib
+models/regression/*.joblib

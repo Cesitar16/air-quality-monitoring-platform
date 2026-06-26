@@ -1,8 +1,9 @@
-﻿pandas
+-r api/requirements.txt
 numpy
 matplotlib
 scikit-learn
-requests
+joblib
+streamlit
+plotly
 jupyter
-openpyxl
-pytest
+nbformat

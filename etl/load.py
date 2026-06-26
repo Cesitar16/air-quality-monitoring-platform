@@ -47,6 +47,8 @@ PAYLOAD_METADATA_FIELDS = {
     "_modo_mapeo",
 }
 
+DATASET_MODELADO_PAGE_SIZE = 1000
+
 
 def _manejar_error_api(
     mensaje: str,
@@ -607,12 +609,30 @@ def guardar_dataset_modelado(
         return df
 
     try:
-        response = requests.get(config.API_DATASET_MODELADO_URL, timeout=10)
-        response.raise_for_status()
-        data = response.json()
-        if not isinstance(data, list):
-            raise ValueError("La API devolvio una estructura invalida.")
-        df = pd.DataFrame(data)
+        filas: list[dict] = []
+        offset = 0
+
+        while True:
+            response = requests.get(
+                config.API_DATASET_MODELADO_URL,
+                params={
+                    "limit": DATASET_MODELADO_PAGE_SIZE,
+                    "offset": offset,
+                },
+                timeout=10,
+            )
+            response.raise_for_status()
+            data = response.json()
+            if not isinstance(data, list):
+                raise ValueError("La API devolvio una estructura invalida.")
+
+            filas.extend(data)
+            if len(data) < DATASET_MODELADO_PAGE_SIZE:
+                break
+
+            offset += DATASET_MODELADO_PAGE_SIZE
+
+        df = pd.DataFrame(filas)
         df.to_csv(config.SALIDA_DATASET_MODELADO, index=False, encoding="utf-8")
         return df
     except (requests.RequestException, ValueError) as exc:

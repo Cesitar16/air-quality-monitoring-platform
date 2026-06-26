@@ -1,0 +1,103 @@
+{
+  "horizon_hours": 24,
+  "sampling_frequency_hours": 6,
+  "target_shift_steps": 4,
+  "train_rows": 21158,
+  "test_rows": 5290,
+  "best_model": "random_forest",
+  "features_used": [
+    "mp25",
+    "mp10",
+    "so2",
+    "no2",
+    "velocidad_viento",
+    "direccion_viento_grados",
+    "temperatura",
+    "humedad",
+    "emision_maxima_permitida",
+    "indice_vulnerabilidad_respiratoria",
+    "hora",
+    "dia",
+    "mes",
+    "dia_semana",
+    "lag_1",
+    "lag_2",
+    "lag_3",
+    "delta_mp25",
+    "mp25_promedio_movil_3",
+    "rolling_mean_6",
+    "rolling_mean_12",
+    "direccion_viento_sin",
+    "direccion_viento_cos",
+    "tipo_sensor",
+    "comuna",
+    "region",
+    "estacion_del_ano"
+  ],
+  "models": {
+    "linear_regression": {
+      "mae": 3.2344081847116866,
+      "rmse": 4.608878761278418,
+      "r2": 0.6735827229850455
+    },
+    "random_forest": {
+      "mae": 2.1487157529930725,
+      "rmse": 3.9977860877231324,
+      "r2": 0.7544037822431401
+    }
+  },
+  "time_series_cv": {
+    "linear_regression": {
+      "n_splits": 3,
+      "mean_mae": 10.816245091493698,
+      "mean_rmse": 13.909043756313556,
+      "mean_r2": -0.8724186896279376,
+      "folds": [
+        {
+          "fold": 1.0,
+          "mae": 9.614257475738027,
+          "rmse": 15.14780911239129,
+          "r2": 0.6056152995276167
+        },
+        {
+          "fold": 2.0,
+          "mae": 18.63659747416836,
+          "rmse": 20.708244684852072,
+          "r2": -3.7406468074335315
+        },
+        {
+          "fold": 3.0,
+          "mae": 4.197880324574707,
+          "rmse": 5.871077471697306,
+          "r2": 0.5177754390221022
+        }
+      ]
+    },
+    "random_forest": {
+      "n_splits": 3,
+      "mean_mae": 7.81507309720386,
+      "mean_rmse": 12.790305236323164,
+      "mean_r2": -0.2131552214365687,
+      "folds": [
+        {
+          "fold": 1.0,
+          "mae": 7.465617098380319,
+          "rmse": 16.821877218586774,
+          "r2": 0.5136271443423297
+        },
+        {
+          "fold": 2.0,
+          "mae": 12.37894885611649,
+          "rmse": 15.414036167444873,
+          "r2": -1.626538504524548
+        },
+        {
+          "fold": 3.0,
+          "mae": 3.6006533371147724,
+          "rmse": 6.135002322937847,
+          "r2": 0.4734456958725122
+        }
+      ]
+    }
+  }
+}

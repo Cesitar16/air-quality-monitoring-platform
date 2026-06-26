@@ -408,6 +408,41 @@ def test_guardar_dataset_modelado_dry_run_genera_dataset_local():
     assert not df.empty
 
 
+def test_guardar_dataset_modelado_descarga_todas_las_paginas(monkeypatch, tmp_path):
+    class FakeResponse:
+        def __init__(self, payload):
+            self._payload = payload
+
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return self._payload
+
+    primera_pagina = [{"fecha_hora": f"2026-06-01T00:00:{indice:02d}"} for indice in range(3)]
+    segunda_pagina = [{"fecha_hora": "2026-06-02T00:00:00"}]
+    respuestas = [primera_pagina, segunda_pagina]
+    llamadas: list[dict] = []
+    salida = tmp_path / "dataset_modelado.csv"
+
+    monkeypatch.setattr("etl.load.DATASET_MODELADO_PAGE_SIZE", 3)
+    monkeypatch.setattr(config, "SALIDA_DATASET_MODELADO", salida)
+
+    def fake_get(url, params=None, timeout=10):
+        llamadas.append({"url": url, "params": params, "timeout": timeout})
+        return FakeResponse(respuestas.pop(0))
+
+    monkeypatch.setattr("etl.load.requests.get", fake_get)
+
+    df = guardar_dataset_modelado(dry_run=False, strict=True)
+
+    assert len(df) == 4
+    assert salida.exists()
+    assert len(llamadas) == 2
+    assert llamadas[0]["params"] == {"limit": 3, "offset": 0}
+    assert llamadas[1]["params"] == {"limit": 3, "offset": 3}
+
+
 def test_run_pipeline_dry_run_genera_payload_reporte_y_dataset():
     main(["--dry-run"])
 
