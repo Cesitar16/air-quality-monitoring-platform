@@ -95,10 +95,48 @@ def cargar_dataset_desde_api(
 
     return pd.DataFrame(registros)
 
+def cargar_dataset(
+    fuente: str = "api",
+    api_url: str = DATASET_URL,
+    ruta_csv: str | Path = "data/processed/dataset_modelado.csv",
+    limit: int = 1000,
+    timeout: int = 30,
+) -> pd.DataFrame:
+    """
+    Carga el dataset desde la API o desde un CSV.
+
+    fuente="api":
+        Usa el endpoint disponible.
+
+    fuente="csv":
+        Usa el archivo procesado entregado por el ETL.
+    """
+    fuente_normalizada = fuente.strip().lower()
+
+    if fuente_normalizada == "api":
+        return cargar_dataset_desde_api(
+            api_url=api_url,
+            limit=limit,
+            timeout=timeout,
+        )
+
+    if fuente_normalizada == "csv":
+        ruta = Path(ruta_csv)
+
+        if not ruta.exists():
+            raise FileNotFoundError(
+                f"No existe el archivo solicitado: {ruta}"
+            )
+
+        return pd.read_csv(ruta)
+
+    raise ValueError(
+        "Fuente no válida. Usa 'api' o 'csv'."
+    )
+
 def preparar_fechas(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Convierte fecha_hora a datetime y crea variables temporales.
-    """
+    #Convierte fecha_hora a datetime y crea variables temporales.
+    
     resultado = df.copy()
 
     if "fecha_hora" not in resultado.columns:
@@ -119,9 +157,8 @@ def preparar_fechas(df: pd.DataFrame) -> pd.DataFrame:
     return resultado
 
 def limpiar_dataset(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Realiza una limpieza básica sin imputar datos para el clustering.
-    """
+    #Realiza una limpieza básica sin imputar datos para el clustering.
+    
     if df.empty:
         return df.copy()
 
@@ -213,9 +250,8 @@ def seleccionar_variables_numericas(
     df: pd.DataFrame,
     columnas: list[str],
 ) -> pd.DataFrame:
-    """
-    Selecciona las variables solicitadas que estén presentes en el dataset.
-    """
+    #Selecciona las variables solicitadas que estén presentes en el dataset.
+    
     columnas_disponibles = [
         columna
         for columna in columnas
@@ -239,9 +275,8 @@ def seleccionar_variables_numericas(
 
 
 def generar_resumen_calidad(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Resume el tipo de dato, cantidad de nulos y valores únicos.
-    """
+    #Resume el tipo de dato, cantidad de nulos y valores únicos.
+    
     if df.empty:
         return pd.DataFrame(
             columns=[
@@ -276,9 +311,7 @@ def guardar_dataset(
     df: pd.DataFrame,
     ruta: str | Path = "data/processed/dataset_modelado.csv",
 ) -> Path:
-    """
-    Guarda el DataFrame procesado como archivo CSV.
-    """
+    #Guarda el DataFrame procesado como archivo CSV.
     ruta_salida = Path(ruta)
     ruta_salida.parent.mkdir(parents=True, exist_ok=True)
 
