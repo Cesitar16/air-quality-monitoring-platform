@@ -110,7 +110,9 @@ PREDICCIONES_COLUMNS = [
     "mp25_real_24h",
     "mp25_predicho",
     "mp25_predicho_24h",
+    "error",
     "error_absoluto",
+    "categoria_alerta",
     "categoria_predicha",
     "categoria_alerta_predicha",
     "mensaje_ciudadano",
@@ -277,16 +279,51 @@ def cargar_dataset_modelado(path: str | Path = DEFAULT_DATASET_PATH) -> pd.DataF
     return df
 
 
-def preparar_dataset_regresion(
-    df: pd.DataFrame,
-    target_shift_steps: int = TARGET_SHIFT_STEPS,
-) -> pd.DataFrame:
-    """Create temporal and historical features without using future information."""
+def cargar_dataset(path: str | Path = DEFAULT_DATASET_PATH) -> pd.DataFrame:
+    """Public alias used by notebooks and demos."""
+    return cargar_dataset_modelado(path)
+
+
+def _ordenar_dataset_temporal(df: pd.DataFrame) -> pd.DataFrame:
     dataset = df.copy()
     dataset["fecha_hora"] = pd.to_datetime(dataset["fecha_hora"], errors="coerce")
     if dataset["fecha_hora"].isna().any():
         raise ValueError("El dataset contiene fechas invalidas en fecha_hora.")
-    dataset = dataset.sort_values(["codigo_estacion", "fecha_hora"]).reset_index(drop=True)
+    return dataset.sort_values(["codigo_estacion", "fecha_hora"]).reset_index(drop=True)
+
+
+def crear_variable_objetivo(
+    df: pd.DataFrame,
+    target_shift_steps: int = TARGET_SHIFT_STEPS,
+) -> pd.DataFrame:
+    """Create the 24h-ahead regression target without leaking future rows."""
+    dataset = _ordenar_dataset_temporal(df)
+
+    grupo_estacion = dataset.groupby("codigo_estacion", group_keys=False, sort=False)
+    dataset["mp25_24h_estacion"] = grupo_estacion["mp25"].shift(-target_shift_steps)
+
+    serie_comuna = (
+        dataset.groupby(["comuna", "fecha_hora"], as_index=False)["mp25"]
+        .mean()
+        .sort_values(["comuna", "fecha_hora"])
+    )
+    serie_comuna["mp25_24h_comuna"] = (
+        serie_comuna.groupby("comuna", sort=False)["mp25"].shift(-target_shift_steps)
+    )
+    dataset = dataset.merge(
+        serie_comuna[["comuna", "fecha_hora", "mp25_24h_comuna"]],
+        on=["comuna", "fecha_hora"],
+        how="left",
+    )
+    dataset[TARGET_COLUMN] = dataset["mp25_24h_estacion"].fillna(dataset["mp25_24h_comuna"])
+    dataset[LEGACY_TARGET_COLUMN] = dataset[TARGET_COLUMN]
+    dataset["fecha_hora_objetivo"] = dataset["fecha_hora"] + pd.Timedelta(hours=TARGET_HORIZON_HOURS)
+    return dataset
+
+
+def ingenieria_caracteristicas(df: pd.DataFrame) -> pd.DataFrame:
+    """Add temporal, historical, and circular-wind features to the dataset."""
+    dataset = _ordenar_dataset_temporal(df)
 
     dataset["hora"] = dataset["fecha_hora"].dt.hour
     dataset["dia"] = dataset["fecha_hora"].dt.day
@@ -312,26 +349,16 @@ def preparar_dataset_regresion(
     dataset["rolling_mean_12"] = grupo_estacion["mp25"].transform(
         lambda serie: serie.shift(1).rolling(window=12, min_periods=1).mean()
     )
-    dataset["mp25_24h_estacion"] = grupo_estacion["mp25"].shift(-target_shift_steps)
-
-    serie_comuna = (
-        dataset.groupby(["comuna", "fecha_hora"], as_index=False)["mp25"]
-        .mean()
-        .sort_values(["comuna", "fecha_hora"])
-    )
-    serie_comuna["mp25_24h_comuna"] = (
-        serie_comuna.groupby("comuna", sort=False)["mp25"].shift(-target_shift_steps)
-    )
-    dataset = dataset.merge(
-        serie_comuna[["comuna", "fecha_hora", "mp25_24h_comuna"]],
-        on=["comuna", "fecha_hora"],
-        how="left",
-    )
-    dataset[TARGET_COLUMN] = dataset["mp25_24h_estacion"].fillna(dataset["mp25_24h_comuna"])
-    dataset[LEGACY_TARGET_COLUMN] = dataset[TARGET_COLUMN]
-    dataset["fecha_hora_objetivo"] = dataset["fecha_hora"] + pd.Timedelta(hours=TARGET_HORIZON_HOURS)
-
     return dataset
+
+
+def preparar_dataset_regresion(
+    df: pd.DataFrame,
+    target_shift_steps: int = TARGET_SHIFT_STEPS,
+) -> pd.DataFrame:
+    """Create temporal and historical features without using future information."""
+    dataset = crear_variable_objetivo(df, target_shift_steps=target_shift_steps)
+    return ingenieria_caracteristicas(dataset)
 
 
 def filtrar_dataset_entrenamiento(df: pd.DataFrame) -> pd.DataFrame:
@@ -434,14 +461,19 @@ def entrenar_modelos(
         resultados[nombre] = ResultadoEntrenamiento(
             nombre_modelo=nombre,
             pipeline=pipeline,
-            metricas={
-                "mae": float(mean_absolute_error(y_test, predicciones)),
-                "rmse": float(np.sqrt(mean_squared_error(y_test, predicciones))),
-                "r2": float(r2_score(y_test, predicciones)),
-            },
+            metricas=evaluar_modelo(y_test, predicciones),
             predicciones_test=predicciones,
         )
     return resultados
+
+
+def evaluar_modelo(y_real: pd.Series | np.ndarray, y_predicho: pd.Series | np.ndarray) -> dict[str, float]:
+    """Compute the main regression metrics used in reports and comparisons."""
+    return {
+        "mae": float(mean_absolute_error(y_real, y_predicho)),
+        "rmse": float(np.sqrt(mean_squared_error(y_real, y_predicho))),
+        "r2": float(r2_score(y_real, y_predicho)),
+    }
 
 
 def evaluar_modelos_time_series_cv(
@@ -496,6 +528,14 @@ def seleccionar_mejor_modelo(metricas_por_modelo: dict[str, dict[str, float]]) -
     return min(metricas_por_modelo, key=lambda nombre: metricas_por_modelo[nombre]["rmse"])
 
 
+def predecir(modelo: Pipeline, df: pd.DataFrame) -> np.ndarray:
+    """Generate predictions from a fitted pipeline using the standard feature set."""
+    columnas_features = obtener_columnas_features()
+    if set(columnas_features).issubset(df.columns):
+        return modelo.predict(df[columnas_features])
+    return modelo.predict(df)
+
+
 def _aplicar_clasificacion_predicha(predicciones: pd.Series) -> pd.DataFrame:
     clasificaciones = predicciones.apply(lambda valor: clasificar_mp25(float(valor)))
     return pd.DataFrame(clasificaciones.tolist(), index=predicciones.index)
@@ -506,9 +546,11 @@ def _enriquecer_exporte_predicciones(df: pd.DataFrame) -> pd.DataFrame:
     exportable["fecha_hora"] = exportable["fecha_hora_objetivo"]
     exportable["mp25_real_24h"] = exportable["mp25_real"]
     exportable["mp25_predicho_24h"] = exportable["mp25_predicho"]
+    exportable["error"] = exportable["mp25_real_24h"] - exportable["mp25_predicho_24h"]
     exportable["error_absoluto"] = (
-        exportable["mp25_real_24h"] - exportable["mp25_predicho_24h"]
+        exportable["error"]
     ).abs()
+    exportable["categoria_alerta"] = exportable["categoria_predicha"]
     exportable["categoria_alerta_predicha"] = exportable["categoria_predicha"]
     return exportable[PREDICCIONES_COLUMNS]
 
@@ -562,7 +604,7 @@ def construir_pronosticos_24h(
         hours=TARGET_HORIZON_HOURS
     )
 
-    predicciones = modelo.predict(ultimas_filas[columnas_features])
+    predicciones = predecir(modelo, ultimas_filas[columnas_features])
     pronosticos = ultimas_filas[
         [
             "fecha_hora",

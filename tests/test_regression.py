@@ -4,15 +4,20 @@ import pytest
 from src.regression import (
     TARGET_SHIFT_STEPS,
     TARGET_COLUMN,
+    cargar_dataset,
     cargar_dataset_modelado,
     cargar_modelo,
     clasificar_mp25,
+    crear_variable_objetivo,
+    evaluar_modelo,
     ejecutar_pipeline_regresion,
     entrenar_modelos,
     filtrar_dataset_entrenamiento,
     guardar_modelo,
+    ingenieria_caracteristicas,
     obtener_columnas_features,
     obtener_importancia_variables,
+    predecir,
     preparar_dataset_regresion,
     seleccionar_mejor_modelo,
     split_temporal,
@@ -111,6 +116,16 @@ def test_cargar_dataset_modelado_corrige_mojibake(tmp_path):
     assert "Chill\u00e1n" in set(df["comuna"])
 
 
+def test_cargar_dataset_alias_reutiliza_dataset_modelado(tmp_path):
+    dataset_path = tmp_path / "dataset_modelado.csv"
+    _crear_dataset_modelado(rows_per_station=4).to_csv(dataset_path, index=False)
+
+    df = cargar_dataset(dataset_path)
+
+    assert not df.empty
+    assert "fecha_hora" in df.columns
+
+
 def test_cargar_dataset_modelado_completa_columnas_faltantes_del_dry_run(tmp_path):
     dataset_path = tmp_path / "dataset_modelado.csv"
     df = _crear_dataset_modelado(rows_per_station=4).drop(
@@ -169,6 +184,19 @@ def test_preparar_dataset_regresion_construye_target_y_lags_sin_fuga():
     assert preparado.loc[2, "rolling_mean_12"] == 15.0
     assert preparado.loc[0, "estacion_del_ano"] == "verano"
     assert preparado.loc[0, "fecha_hora_objetivo"] == pd.Timestamp("2026-01-02 00:00:00")
+
+
+def test_crear_variable_objetivo_e_ingenieria_caracteristicas_se_pueden_usar_por_separado():
+    df = _crear_dataset_modelado(rows_per_station=8)
+
+    con_target = crear_variable_objetivo(df, target_shift_steps=TARGET_SHIFT_STEPS)
+    con_features = ingenieria_caracteristicas(con_target)
+
+    assert TARGET_COLUMN in con_target.columns
+    assert "fecha_hora_objetivo" in con_target.columns
+    assert {"lag_1", "lag_2", "lag_3", "rolling_mean_12", "estacion_del_ano"}.issubset(
+        con_features.columns
+    )
 
 
 def test_preparar_dataset_regresion_hace_fallback_por_comuna_si_estacion_no_alcanza():
@@ -239,6 +267,20 @@ def test_entrenar_modelos_devuelve_metricas_para_ambos():
         assert len(resultado.predicciones_test) == len(test_df)
 
 
+def test_evaluar_modelo_y_predecir_exponen_api_publica():
+    dataset = preparar_dataset_regresion(_crear_dataset_modelado())
+    entrenamiento = filtrar_dataset_entrenamiento(dataset)
+    train_df, test_df = split_temporal(entrenamiento)
+    resultados = entrenar_modelos(train_df, test_df)
+    modelo = resultados["random_forest"].pipeline
+
+    predicciones = predecir(modelo, test_df)
+    metricas = evaluar_modelo(test_df[TARGET_COLUMN], predicciones)
+
+    assert len(predicciones) == len(test_df)
+    assert {"mae", "rmse", "r2"} == set(metricas)
+
+
 def test_seleccionar_mejor_modelo_por_rmse():
     metricas = {
         "linear_regression": {"mae": 4.0, "rmse": 5.0, "r2": 0.8},
@@ -295,7 +337,9 @@ def test_ejecutar_pipeline_regresion_genera_artefactos_y_predicciones(tmp_path):
         "fecha_hora",
         "mp25_real_24h",
         "mp25_predicho_24h",
+        "error",
         "error_absoluto",
+        "categoria_alerta",
         "categoria_alerta_predicha",
     }.issubset(predicciones.columns)
     assert len(
